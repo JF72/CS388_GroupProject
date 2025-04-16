@@ -165,7 +165,6 @@
         android:id="@+id/facebookBtn"
         android:layout_width="259dp"
         android:layout_height="48dp"
-        android:layout_marginTop="628dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/rounded_button_outline"
         android:clickable="true"
@@ -174,11 +173,11 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        app:layout_constraintBottom_toTopOf=""
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintVertical_bias="0.987">
 
         <ImageView
             android:layout_width="20dp"
@@ -195,28 +194,4 @@
             android:textSize="16sp" />
     </LinearLayout>
 
-    <!--    <Button-->
-<!--        android:id="@+id/googleBtn"-->
-<!--        android:layout_width="281dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginBottom="40dp"-->
-<!--        android:text="Button"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/fbBtn"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="1.0"-->
-<!--        android:background="@drawable/rounded_button_outline"/>-->
-
-<!--    <Button-->
-<!--        android:id="@+id/fbBtn"-->
-<!--        android:layout_width="281dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Button"-->
-<!--        android:background="@drawable/rounded_button_outline"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="0.976" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>
