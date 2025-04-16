@@ -2,6 +2,9 @@ package com.example.taro
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,7 +14,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.taro.ui.theme.TaroTheme
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -29,32 +34,22 @@ class MainActivity : ComponentActivity() {
             Log.w("FirestoreTest", "Error adding document", e)
         }
         super.onCreate(savedInstanceState)
+
+        val TaroQuotesView = R.layout.taro_quotes;
+        val TaroInitialQuestionareView = R.layout.initial_questionarie;
         enableEdgeToEdge()
-        setContent {
-            TaroTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        setContentView(TaroInitialQuestionareView);
+
+        val YesBtn = findViewById<Button>(R.id.YesBtn);
+        val NoBtn = findViewById<Button>(R.id.NoBtn);
+
+        NoBtn.setOnClickListener{
+            setContentView(TaroQuotesView);
+        }
+        YesBtn.setOnClickListener{
+            Toast.makeText(it.context, "Login Page has not been set up!", Toast.LENGTH_SHORT).show()
+
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TaroTheme {
-        Greeting("Android")
-    }
-}

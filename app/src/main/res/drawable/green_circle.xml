@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <solid android:color="#16FD82" /> <!-- Circle Color (Red) -->
+            <size android:width="100dp" android:height="100dp" /> <!-- Circle Size -->
+            <corners android:radius="500px" /> <!-- Makes it a circle -->
+        </shape>
+    </item>
+</selector>
+
+
