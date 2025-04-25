@@ -1,5 +1,6 @@
 package com.example.taro
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -45,9 +46,12 @@ class MainActivity : ComponentActivity() {
 
         NoBtn.setOnClickListener{
             setContentView(TaroQuotesView);
+            val intent1 = Intent(this, TaroLogin::class.java)
+            startActivity(intent1)
         }
         YesBtn.setOnClickListener{
-            Toast.makeText(it.context, "Login Page has not been set up!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, TaroRegister::class.java)
+            startActivity((intent))
 
         }
     }
