@@ -29,6 +29,7 @@ class TaroLogin : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Email entered: $email", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, TaroPassword::class.java)
+                intent.putExtra("email", email)
                 startActivity(intent)
             }
         }

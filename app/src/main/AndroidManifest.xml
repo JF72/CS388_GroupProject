@@ -29,6 +29,11 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
         <activity android:name=".TaroRegister"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".TaroHomePage" />
+        <activity android:name=".TaroProfilePage" />
+        <activity android:name=".TaroTasksPage" />
+
+
 
         <meta-data
             android:name="preloaded_fonts"
