@@ -17,7 +17,7 @@ class TaroLogin : AppCompatActivity() {
         // Link views to code
         val emailInput = findViewById<EditText>(R.id.email_input)
         val nextButton = findViewById<Button>(R.id.logIn_next_btn)
-        val appleBtn = findViewById<LinearLayout>(R.id.appleBtn)
+
         val googleBtn = findViewById<LinearLayout>(R.id.googleBtn)
         val facebookBtn = findViewById<LinearLayout>(R.id.facebookBtn)
 
@@ -35,9 +35,6 @@ class TaroLogin : AppCompatActivity() {
         }
 
         // Temp
-        appleBtn.setOnClickListener {
-            Toast.makeText(this, "Apple Login not implemented yet.", Toast.LENGTH_SHORT).show()
-        }
 
         googleBtn.setOnClickListener {
             Toast.makeText(this, "Google Login not implemented yet.", Toast.LENGTH_SHORT).show()

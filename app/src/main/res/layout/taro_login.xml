@@ -16,12 +16,10 @@
         android:layout_marginTop="424dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/appleBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
         <View
             android:layout_width="0dp"
@@ -96,47 +94,13 @@
         app:layout_constraintTop_toBottomOf="@+id/emailTextView" />
 
     <LinearLayout
-        android:id="@+id/appleBtn"
-        android:layout_width="259dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="512dp"
-        android:background="@drawable/rounded_button_outline"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?attr/selectableItemBackground"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/googleBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginEnd="12dp"
-            android:src="@drawable/ic_apple" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins"
-            android:text="Continue with Apple"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/googleBtn"
         android:layout_width="259dp"
         android:layout_height="44dp"
-        android:layout_marginTop="572dp"
         android:background="@drawable/rounded_button_outline"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?attr/selectableItemBackground"
+        android:foreground="?android:attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
@@ -144,7 +108,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.923">
 
         <ImageView
             android:layout_width="20dp"
@@ -169,7 +133,7 @@
         android:background="@drawable/rounded_button_outline"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?attr/selectableItemBackground"
+        android:foreground="?android:attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
@@ -177,7 +141,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.987">
+        app:layout_constraintVertical_bias="0.891">
 
         <ImageView
             android:layout_width="20dp"
