@@ -12,7 +12,12 @@
           "package_name": "com.example.taro"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1015809442570-cba3b9nm067ig9u6ojrb723p8le8177i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCYX51PmB-k-4XjBJCtukgEy3t0WorsJ9c"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1015809442570-cba3b9nm067ig9u6ojrb723p8le8177i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
