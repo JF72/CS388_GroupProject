@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:elevation="4dp"
+    app:cardCornerRadius="12dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/taskName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Task Name"
+            android:textSize="18sp"
+            android:textColor="#1877F2"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/taskPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Points: 50"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/taskDueDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Due: 2025-05-01"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <!-- Complete Button -->
+        <Button
+            android:id="@+id/completeTaskButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mark Complete"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
