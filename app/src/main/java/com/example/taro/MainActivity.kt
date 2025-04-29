@@ -55,5 +55,15 @@ class MainActivity : ComponentActivity() {
 
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        if (currentUser != null){
+            val intent = Intent(this, TaroHomePage::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
 }
 

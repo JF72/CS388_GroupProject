@@ -25,9 +25,16 @@ class TaroRegister : AppCompatActivity() {
         val registerBtn = findViewById<Button>(R.id.register_button)
         val showHidePassword = findViewById<ImageButton>(R.id.show_hide_password)
         val showHideConfirmPassword = findViewById<ImageButton>(R.id.show_hide_confirm_password)
+        val goToLogin = findViewById<TextView>(R.id.goToLogin) // ✅ Move this here
 
         var isPasswordVisible = false
         var isConfirmPasswordVisible = false
+
+        // ⭐ Setup click listener for "Go to Login" immediately
+        goToLogin.setOnClickListener {
+            val intent = Intent(this, TaroLogin::class.java)
+            startActivity(intent)
+        }
 
         // Show/hide password logic
         showHidePassword.setOnClickListener {
@@ -57,7 +64,6 @@ class TaroRegister : AppCompatActivity() {
             val confirmPassword = confirmPasswordInput.text.toString().trim()
 
             val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$")
-
 
             when {
                 username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ->
@@ -113,3 +119,4 @@ class TaroRegister : AppCompatActivity() {
         }
     }
 }
+

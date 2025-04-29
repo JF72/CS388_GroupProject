@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
@@ -29,11 +30,18 @@ class TaroLogin : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Email entered: $email", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, TaroPassword::class.java)
+                intent.putExtra("email", email)
                 startActivity(intent)
             }
         }
 
-        // Temp
+
+        val goToRegister = findViewById<TextView>(R.id.goToRegister)
+
+        goToRegister.setOnClickListener {
+            val intent = Intent(this, TaroRegister::class.java)
+            startActivity(intent)
+        }
 
         googleBtn.setOnClickListener {
             Toast.makeText(this, "Google Login not implemented yet.", Toast.LENGTH_SHORT).show()
