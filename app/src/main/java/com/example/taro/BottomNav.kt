@@ -33,6 +33,13 @@ object BottomNav {
                     }
                     true
                 }
+                R.id.nav_statistics -> {
+                    if (currentActivity?.javaClass != TaroStatsPage::class.java) {
+                        context.startActivity(Intent(context, TaroStatsPage::class.java))
+                        currentActivity?.finish()
+                    }
+                    true
+                }
                 else -> false
             }
         }
