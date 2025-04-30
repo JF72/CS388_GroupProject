@@ -65,6 +65,7 @@ class TaroProfilePage : ComponentActivity() {
             val intent = Intent(this, TaroJoinGroupPage::class.java)
             startActivity(intent)
         }
+
         val logoutButton = findViewById<Button>(R.id.logoutButton)
         logoutButton.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
@@ -73,6 +74,14 @@ class TaroProfilePage : ComponentActivity() {
             startActivity(intent)
             finish()
         }
+        /*val generateDataButton = findViewById<Button>(R.id.generateDataButton)
+        generateDataButton.setOnClickListener {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                DevDataGenerator.generateDummyTasks(this, userId, weeks = 4, tasksPerWeek = 5)
+            }
+        }*/
+
 
     }
     override fun onResume() {
@@ -95,7 +104,6 @@ class TaroProfilePage : ComponentActivity() {
         }
 
         if (userId != null) {
-            // Fetch total points
             db.collection("users")
                 .document(userId)
                 .get()
