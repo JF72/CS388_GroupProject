@@ -6,15 +6,56 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.*
 
-class TaskAdapter(private val tasks: List<UserTask>, private val onTaskClicked: (UserTask) -> Unit, private val onCompleteClicked: (UserTask) -> Unit) :
-    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+class TaskAdapter(
+    private val tasks: List<UserTask>,
+    private val onTaskClicked: (UserTask) -> Unit,
+    private val onCompleteClicked: (UserTask) -> Unit,
+    private val onEditClicked: (UserTask) -> Unit
+) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
-    class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val taskName: TextView = itemView.findViewById(R.id.taskName)
         val taskPoints: TextView = itemView.findViewById(R.id.taskPoints)
         val taskDueDate: TextView = itemView.findViewById(R.id.taskDueDate)
         val completeTaskButton: Button = itemView.findViewById(R.id.completeTaskButton)
+        val editTaskButton: Button = itemView.findViewById(R.id.editTaskButton) // <-- Add this to XML
+
+        fun bind(task: UserTask) {
+            taskName.text = task.name
+            taskPoints.text = "Points: ${task.points}"
+
+            taskDueDate.text = task.dueDate?.let {
+                val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                "Due: ${formatter.format(Date(it))}"
+            } ?: "No Due Date"
+
+            if (task.completed) {
+                itemView.alpha = 0.5f
+                completeTaskButton.isEnabled = false
+                completeTaskButton.text = "Completed"
+                editTaskButton.isEnabled = false
+            } else {
+                itemView.alpha = 1.0f
+                completeTaskButton.isEnabled = true
+                completeTaskButton.text = "Mark Complete"
+                editTaskButton.isEnabled = true
+            }
+
+            completeTaskButton.setOnClickListener {
+                onCompleteClicked(task)
+            }
+
+            editTaskButton.setOnClickListener {
+                onEditClicked(task)
+            }
+
+            itemView.setOnClickListener {
+                onTaskClicked(task)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -24,40 +65,8 @@ class TaskAdapter(private val tasks: List<UserTask>, private val onTaskClicked: 
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        val task = tasks[position]
-
-        holder.taskName.text = task.name
-        holder.taskPoints.text = "Points: ${task.points}"
-        holder.taskDueDate.text = if (task.dueDate != null) {
-            val date = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                .format(java.util.Date(task.dueDate))
-            "Due: $date"
-        } else {
-            "No Due Date"
-        }
-
-        // NEW: Change appearance based on completion
-        if (task.completed) {
-            holder.itemView.alpha = 0.5f  // Lightly fade out the card
-            holder.completeTaskButton.isEnabled = false
-            holder.completeTaskButton.text = "Completed"
-        } else {
-            holder.itemView.alpha = 1.0f
-            holder.completeTaskButton.isEnabled = true
-            holder.completeTaskButton.text = "Mark Complete"
-        }
-
-        holder.completeTaskButton.setOnClickListener {
-            onCompleteClicked(task)
-        }
-
-        holder.itemView.setOnClickListener {
-            onTaskClicked(task)
-        }
+        holder.bind(tasks[position])
     }
 
-
-    override fun getItemCount(): Int {
-        return tasks.size
-    }
+    override fun getItemCount(): Int = tasks.size
 }

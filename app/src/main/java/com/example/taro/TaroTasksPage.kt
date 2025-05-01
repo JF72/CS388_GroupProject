@@ -2,7 +2,6 @@ package com.example.taro
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,24 +33,38 @@ class TaroTasksPage : ComponentActivity() {
 
         tasksRecyclerView = findViewById(R.id.tasksRecyclerView)
         tasksRecyclerView.layoutManager = LinearLayoutManager(this)
-        taskAdapter = TaskAdapter(taskList,
+        taskAdapter = TaskAdapter(
+            taskList,
             onTaskClicked = { task ->
                 val intent = Intent(this, TaskDetailPage::class.java)
                 intent.putExtra("name", task.name)
                 intent.putExtra("description", task.description)
                 intent.putExtra("points", task.points)
-                intent.putExtra("dueDate", task.dueDate?.let { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date(it)) } ?: "No Due Date")
+                intent.putExtra(
+                    "dueDate",
+                    task.dueDate?.let {
+                        java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                            .format(java.util.Date(it))
+                    } ?: "No Due Date"
+                )
                 startActivity(intent)
             },
             onCompleteClicked = { task ->
                 markTaskComplete(task)
+            },
+            onEditClicked = { task ->
+                val intent = Intent(this, EditTaskActivity::class.java)
+                intent.putExtra("taskId", task.id)
+                intent.putExtra("name", task.name)
+                intent.putExtra("description", task.description)
+                intent.putExtra("points", task.points)
+                task.dueDate?.let { intent.putExtra("dueDate", it) }
+                startActivity(intent)
             }
         )
         tasksRecyclerView.adapter = taskAdapter
-
-        tasksRecyclerView.adapter = taskAdapter
-
     }
+
     override fun onResume() {
         super.onResume()
         loadTasks()
@@ -79,7 +92,6 @@ class TaroTasksPage : ComponentActivity() {
                         )
                         taskList.add(task)
                     }
-                    // 🛠 Sort: Uncompleted first, completed last
                     taskList.sortWith(compareBy({ it.completed }, { it.dueDate ?: Long.MAX_VALUE }))
                     taskAdapter.notifyDataSetChanged()
                 }
@@ -116,6 +128,4 @@ class TaroTasksPage : ComponentActivity() {
                 }
         }
     }
-
-
 }
