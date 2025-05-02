@@ -38,7 +38,8 @@
         <activity android:name=".TaroJoinGroupPage" />
         <activity android:name=".TaroStatsPage" />
         <activity android:name=".EditTaskActivity" />
-
+        <activity android:name=".GroupTaskList" />
+        <activity android:name=".GroupDetailActivity" />
 
 
 

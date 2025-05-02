@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#ECFFF4">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            android:backgroundTint="#1877F2"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/groupTasksHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Group Tasks"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <ListView
+            android:id="@+id/groupTasksListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dividerHeight="12dp"
+            android:nestedScrollingEnabled="true"
+            android:scrollbars="vertical" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#BDBDBD"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/leaderboardHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leaderboard"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <ListView
+            android:id="@+id/leaderboardListView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:dividerHeight="10dp"
+            android:nestedScrollingEnabled="true"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+</ScrollView>

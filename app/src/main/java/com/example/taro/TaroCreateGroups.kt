@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
@@ -52,9 +53,18 @@ class TaroCreateGroupPage : ComponentActivity() {
 
         db.collection("groups")
             .add(groupData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Group created! Code: $groupCode", Toast.LENGTH_LONG).show()
-                finish() // Go back after creation
+            .addOnSuccessListener { docRef ->
+                val groupId = docRef.id
+
+                db.collection("users").document(userId)
+                    .update("groupIds", FieldValue.arrayUnion(groupId))
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Group created! Code: $groupCode", Toast.LENGTH_LONG).show()
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Group created but failed to update user: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to create group: ${e.message}", Toast.LENGTH_SHORT).show()

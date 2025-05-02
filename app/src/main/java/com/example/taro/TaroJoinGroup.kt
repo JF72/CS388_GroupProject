@@ -47,13 +47,22 @@ class TaroJoinGroupPage : ComponentActivity() {
                     Toast.makeText(this, "Invalid group code", Toast.LENGTH_SHORT).show()
                 } else {
                     val groupDoc = documents.first()
-                    val groupRef = db.collection("groups").document(groupDoc.id)
+                    val groupId = groupDoc.id
+                    val groupRef = db.collection("groups").document(groupId)
 
-                    // Add user to members array
+                    // 1. Add user to group's members list
                     groupRef.update("members", com.google.firebase.firestore.FieldValue.arrayUnion(userId))
                         .addOnSuccessListener {
-                            Toast.makeText(this, "Successfully joined group!", Toast.LENGTH_SHORT).show()
-                            finish()
+                            // 2. Add group ID to user's groupIds array
+                            db.collection("users").document(userId)
+                                .update("groupIds", com.google.firebase.firestore.FieldValue.arrayUnion(groupId))
+                                .addOnSuccessListener {
+                                    Toast.makeText(this, "Successfully joined group!", Toast.LENGTH_SHORT).show()
+                                    finish()
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(this, "Failed to update user: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
                         }
                         .addOnFailureListener { e ->
                             Toast.makeText(this, "Failed to join group: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -64,4 +73,5 @@ class TaroJoinGroupPage : ComponentActivity() {
                 Toast.makeText(this, "Failed to find group: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 }

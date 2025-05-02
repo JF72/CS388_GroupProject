@@ -87,7 +87,9 @@ class TaroRegister : AppCompatActivity() {
                                 val db = FirebaseFirestore.getInstance()
                                 val userMap = hashMapOf(
                                     "username" to username,
-                                    "email" to email
+                                    "email" to email,
+                                    "groupIds" to listOf<String>(),
+                                    "totalPoints" to 0
                                 )
                                 db.collection("users").document(userId).set(userMap)
                                     .addOnSuccessListener {
