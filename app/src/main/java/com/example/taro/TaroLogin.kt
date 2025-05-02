@@ -28,23 +28,10 @@ class TaroLogin : AppCompatActivity() {
             if (email.isEmpty()) {
                 Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show()
             } else {
-                val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
-                auth.fetchSignInMethodsForEmail(email)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val signInMethods = task.result?.signInMethods
-                            if (signInMethods.isNullOrEmpty()) {
-                                Toast.makeText(this, "No account found for this email", Toast.LENGTH_SHORT).show()
-                            } else {
-                                // Email is registered — proceed to password screen
-                                val intent = Intent(this, TaroPassword::class.java)
-                                intent.putExtra("email", email)
-                                startActivity(intent)
-                            }
-                        } else {
-                            Toast.makeText(this, "Error checking email: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                        }
-                    }
+                Toast.makeText(this, "Email entered: $email", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, TaroPassword::class.java)
+                intent.putExtra("email", email)
+                startActivity(intent)
             }
         }
 
