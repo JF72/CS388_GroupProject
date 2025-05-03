@@ -39,7 +39,6 @@ class TaroHomePage : ComponentActivity() {
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         BottomNav.setupBottomNav(bottomNavView, this)
         bottomNavView.selectedItemId = R.id.nav_home
-        welcomeText = findViewById(R.id.welcomeText)
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -59,7 +58,13 @@ class TaroHomePage : ComponentActivity() {
             Pair("Task3",false),
             Pair("Task4",false),
             Pair("Task5",false),
-            Pair("Task6",false)
+            Pair("Task6",false),
+            Pair("Task7",false),
+            Pair("Task8",false),
+            Pair("Task9",false),
+            Pair("Task10",false)
+
+
         )
 
         DateComposeRecyclerView = findViewById(R.id.DateRecyclerView);
@@ -77,6 +82,7 @@ class TaroHomePage : ComponentActivity() {
         TaskListRecyclerView.adapter = TaskListAdapter
 
 
+        /* Deleted Welcome Message
 
         if (userId != null) {
             val db = FirebaseFirestore.getInstance()
@@ -97,7 +103,7 @@ class TaroHomePage : ComponentActivity() {
         } else {
             welcomeText.text = "Welcome!"
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
-        }
+        } */
 
     }
 }

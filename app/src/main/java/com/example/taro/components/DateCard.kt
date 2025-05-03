@@ -13,12 +13,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
+@Preview
 @Composable
 fun DateCard(
-    day: String,
-    month: String,
-    weekday: String
+    day: String = "Sunday",
+    month: String = "April",
+    weekday: String =  "1"
 ) {
     Card(
         modifier = Modifier

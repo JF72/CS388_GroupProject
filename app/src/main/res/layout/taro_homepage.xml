@@ -12,21 +12,6 @@
 
     <!-- Bottom Navigation Bar -->
 
-    <TextView
-        android:id="@+id/welcomeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="Welcome!"
-        android:textColor="#1877F2"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.752" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
@@ -40,26 +25,23 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/DateRecyclerView"
-        android:layout_width="355dp"
-        android:layout_height="122dp"
+        android:layout_width="408dp"
+        android:layout_height="127dp"
         android:layout_marginTop="128dp"
-        app:layout_constraintBottom_toTopOf="@+id/welcomeText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.08" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/TaskListRecyclerView"
-        android:layout_width="352dp"
-        android:layout_height="185dp"
+        android:layout_width="335dp"
+        android:layout_height="541dp"
         android:layout_margin="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/welcomeText"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.36"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/DateRecyclerView"
-        app:layout_constraintVertical_bias="0.469" />
+        app:layout_constraintTop_toBottomOf="@+id/DateRecyclerView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
