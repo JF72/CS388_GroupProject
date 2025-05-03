@@ -10,6 +10,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class TaroTasksPage : ComponentActivity() {
 
@@ -43,8 +46,8 @@ class TaroTasksPage : ComponentActivity() {
                 intent.putExtra(
                     "dueDate",
                     task.dueDate?.let {
-                        java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                            .format(java.util.Date(it))
+                        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            .format(Date(it))
                     } ?: "No Due Date"
                 )
                 startActivity(intent)

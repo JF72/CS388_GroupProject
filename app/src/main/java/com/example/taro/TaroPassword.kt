@@ -27,6 +27,9 @@ class TaroPassword : AppCompatActivity() {
             } else if (password.isEmpty()) {
                 Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show()
             } else {
+                startActivity(Intent(this,TaroHomePage::class.java))
+                finish()
+                /**
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show()
@@ -34,7 +37,7 @@ class TaroPassword : AppCompatActivity() {
                         finish()
                     }.addOnFailureListener { e ->
                         Toast.makeText(this, "Login failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
+                    } **/
             }
         }
 

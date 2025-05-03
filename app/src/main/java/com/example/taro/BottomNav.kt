@@ -6,7 +6,6 @@ import android.content.Intent
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 object BottomNav {
-
     fun setupBottomNav(bottomNavView: BottomNavigationView, context: Context) {
         bottomNavView.setOnItemSelectedListener { item ->
             val currentActivity = context as? Activity
