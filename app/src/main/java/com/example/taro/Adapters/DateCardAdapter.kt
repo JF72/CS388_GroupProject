@@ -6,19 +6,22 @@ import com.example.taro.R
 import com.example.taro.components.DateCard
 
 class DateCardAdapter(
-    private val items: List<Triple<String, String, String>>
+    private val items: MutableList<Triple<String, String, String>>
 ) : RecyclerView.Adapter<DateCardAdapter.DateCardViewHolder>() {
 
     class DateCardViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DateCardViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.date_compose_item, parent, false) as ComposeView
-        return DateCardViewHolder(view)
+        // Inflate ComposeView and pass it to the ViewHolder
+        val composeView = ComposeView(parent.context)
+        return DateCardViewHolder(composeView)
     }
 
     override fun onBindViewHolder(holder: DateCardViewHolder, position: Int) {
+        // Get the item
         val (day, month, weekday) = items[position]
+
+        // Set content using Jetpack Compose
         holder.composeView.setContent {
             DateCard(day = day, month = month, weekday = weekday)
         }

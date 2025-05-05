@@ -1,20 +1,22 @@
 package com.example.taro
 
 import DateCardAdapter
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taro.Adapters.TaskListComposeAdapter
-
-import com.example.taro.components.DateCard
+import kotlinx.coroutines.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import java.util.Date
+import java.time.LocalDateTime
+import java.time.format.TextStyle
+import java.util.Locale
 
 
 class TaroHomePage : ComponentActivity() {
@@ -23,26 +25,38 @@ class TaroHomePage : ComponentActivity() {
     private lateinit var DateComposeRecyclerView : RecyclerView
     private lateinit var adapter : DateCardAdapter
 
-
-
     /** List Item Recycler View */
     private lateinit var  TaskListRecyclerView : RecyclerView
     private lateinit var TaskListAdapter : TaskListComposeAdapter
 
+    /** By Default it will hold the Previous and After 30 days. */
+    private var dayContext: MutableMap<String, MutableList<Triple<String, String, String>>>? = null
 
-
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.taro_homepage)
 
         super.onCreate(savedInstanceState)
 
+
+            /** Default 30 days*/
+        dayContext =  generateDayContext(5) ;
+
+
+
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         BottomNav.setupBottomNav(bottomNavView, this)
         bottomNavView.selectedItemId = R.id.nav_home
-
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
-        val data = listOf(
+
+        /**
+         *  Created A list of Triples based on the Previews 30 days and the Upcoming 30 Days
+         *  It most Have : Month , DateNumber, Day of the Week
+         */
+
+
+        val data = mutableListOf(
             Triple("11", "April", "Friday"),
             Triple("12", "May", "Saturday"),
             Triple("13", "June", "Sunday"),
@@ -52,6 +66,13 @@ class TaroHomePage : ComponentActivity() {
             Triple("13", "June", "Sunday")
         )
 
+
+
+        val concatenatedList = mutableListOf<Triple<String, String, String>>().apply {
+            (dayContext?.get("PreviousDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
+            (dayContext?.get("UpcomingDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
+        }
+        Log.e("ConcatenatedList",concatenatedList.size.toString())
         val taskListDummyData = listOf(
             Pair("Task1",false),
             Pair("Task2",false),
@@ -68,7 +89,7 @@ class TaroHomePage : ComponentActivity() {
         )
 
         DateComposeRecyclerView = findViewById(R.id.DateRecyclerView);
-        adapter = DateCardAdapter(data);
+        adapter = DateCardAdapter(concatenatedList);
 
         DateComposeRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         DateComposeRecyclerView.adapter = adapter;
@@ -106,4 +127,48 @@ class TaroHomePage : ComponentActivity() {
         } */
 
     }
+}
+@RequiresApi(Build.VERSION_CODES.O)
+fun generateDayContext(amount: Long) : MutableMap<String,MutableList<Triple<String,String,String>>>{
+
+
+    val today = LocalDateTime.now()
+
+    val previousDaysList : MutableList<Triple<String,String,String>> = mutableListOf() ;
+    val upcomingDaysList : MutableList<Triple<String,String,String>> = mutableListOf();
+
+    /** Might need performance update*/
+    for (i in 1..amount ){
+        val previousDate : LocalDateTime = today.minusDays(i);
+        val nextDate : LocalDateTime = today.plusDays(i);
+
+        val previousMonth : String = previousDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault());
+        val previousDayName : String =previousDate.dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault())
+        val previousDayNumber : String = previousDate.dayOfMonth.toString().padStart(2 )
+
+        val formattedPreviousDate : Triple<String,String,String> = Triple(previousMonth,previousDayName,previousDayNumber)
+
+
+        val upcomingMonths : String = nextDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault());
+        val upcomingDayName : String =nextDate.dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault())
+        val upcomingDayNumber : String = nextDate.dayOfMonth.toString().padStart(2 )
+
+        val formattedUpcomingDate :  Triple<String,String,String> = Triple(upcomingMonths,upcomingDayName,upcomingDayNumber)
+
+        previousDaysList.add(formattedPreviousDate);
+
+        upcomingDaysList.add(formattedUpcomingDate);
+
+    }
+
+
+    val generatedContext: MutableMap<String, MutableList<Triple<String, String, String>>> = mutableMapOf();
+
+    generatedContext["PreviousDays"] = previousDaysList;
+    generatedContext["UpcomingDays"] = upcomingDaysList;
+    Log.e("Fucntion CAll",previousDaysList[0].toString())
+
+    return  generatedContext;
+
+
 }

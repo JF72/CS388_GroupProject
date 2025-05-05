@@ -39,6 +39,7 @@ class TaskCreation : AppCompatActivity() {
             showDatePickerDialog()
         }
 
+        /** Change To save on local storage **/
         saveTaskButton.setOnClickListener {
             saveTaskToFirebase()
         }

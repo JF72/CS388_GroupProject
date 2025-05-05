@@ -22,8 +22,8 @@ fun DateCard(
 ) {
     Card(
         modifier = Modifier
-            .size(width = 64.dp, height = 85.dp),
-        shape = RoundedCornerShape(20.dp),
+            .size(width = 64.dp, height = 85.dp).padding(1.dp),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF2C6AFD)
         )
@@ -37,18 +37,18 @@ fun DateCard(
         ) {
             Text(
                 text = month,
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.White
             )
             Text(
-                text = day,
+                text = weekday,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Text(
-                text = weekday,
+                text = day,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.White
