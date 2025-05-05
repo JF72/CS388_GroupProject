@@ -8,13 +8,15 @@ import android.util.Log
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taro.Adapters.TaskListComposeAdapter
+import com.example.taro.components.AddTaskPopUp
 import com.example.taro.Dao.UserTaskDb
 import kotlinx.coroutines.*
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -38,17 +40,28 @@ class TaroHomePage : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.taro_homepage)
 
+        var showAddTaskPopUp = true;
+
+        var taskPopUpComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.taskAddPopUp)
+        val headerComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.headerNavBar)
+        headerComposeView.setContent {
+            com.example.taro.components.HeaderBar()
+        }
+
         super.onCreate(savedInstanceState)
 
+
+        if(showAddTaskPopUp){
+            taskPopUpComposeView.setContent{
+                AddTaskPopUp (onDismissRequest = {
+                    taskPopUpComposeView.setContent {}
+                })
+            }
+        }
 
             /** Default 30 days*/
         dayContext =  generateDayContext(5) ;
 
-
-
-        val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        /**BottomNav.setupBottomNav(bottomNavView, this) **/
-        bottomNavView.selectedItemId = R.id.nav_home
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
 

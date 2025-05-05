@@ -19,10 +19,10 @@ object BottomNav {
                     true
                 }
                 R.id.nav_tasks -> {
-                    if (currentActivity?.javaClass != TaroTasksPage::class.java) {
-                        context.startActivity(Intent(context, TaroTasksPage::class.java))
-                        currentActivity?.finish()
-                    }
+//                    if (currentActivity?.javaClass != TaroTasksPage::class.java) {
+//                        context.startActivity(Intent(context, TaroTasksPage::class.java))
+//                        currentActivity?.finish()
+//                    }
                     true
                 }
                 R.id.nav_profile -> {
