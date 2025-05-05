@@ -36,6 +36,8 @@ class TaroTasksPage : ComponentActivity() {
 
         tasksRecyclerView = findViewById(R.id.tasksRecyclerView)
         tasksRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        /** Must Update To new classEntity
         taskAdapter = TaskAdapter(
             taskList,
             onTaskClicked = { task ->
@@ -66,13 +68,19 @@ class TaroTasksPage : ComponentActivity() {
             }
         )
         tasksRecyclerView.adapter = taskAdapter
+
+        **/
     }
 
+    /**
     override fun onResume() {
         super.onResume()
         loadTasks()
     }
 
+    **/
+
+    /**
     private fun loadTasks() {
         val db = FirebaseFirestore.getInstance()
         val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -131,4 +139,6 @@ class TaroTasksPage : ComponentActivity() {
                 }
         }
     }
+
+    **/
 }
