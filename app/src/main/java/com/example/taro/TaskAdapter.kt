@@ -26,24 +26,7 @@ class TaskAdapter(
 
         fun bind(task: UserTask) {
             taskName.text = task.name
-            taskPoints.text = "Points: ${task.points}"
-
-            taskDueDate.text = task.dueDate?.let {
-                val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                "Due: ${formatter.format(Date(it))}"
-            } ?: "No Due Date"
-
-            if (task.completed) {
-                itemView.alpha = 0.5f
-                completeTaskButton.isEnabled = false
-                completeTaskButton.text = "Completed"
-                editTaskButton.isEnabled = false
-            } else {
-                itemView.alpha = 1.0f
-                completeTaskButton.isEnabled = true
-                completeTaskButton.text = "Mark Complete"
-                editTaskButton.isEnabled = true
-            }
+            taskPoints.text = "Points: ${task.taroScore}"
 
             completeTaskButton.setOnClickListener {
                 onCompleteClicked(task)
