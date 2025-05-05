@@ -1,6 +1,7 @@
 package com.example.taro
 
 import DateCardAdapter
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -11,20 +12,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taro.Adapters.TaskListComposeAdapter
+import com.example.taro.Dao.UserTaskDb
 import kotlinx.coroutines.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
 
 class TaroHomePage : ComponentActivity() {
-
     private lateinit var welcomeText: TextView
     private lateinit var DateComposeRecyclerView : RecyclerView
     private lateinit var adapter : DateCardAdapter
-
+    private val taroManager : TaroTasksManager = TaroTasksManager()
     /** List Item Recycler View */
     private lateinit var  TaskListRecyclerView : RecyclerView
     private lateinit var TaskListAdapter : TaskListComposeAdapter
@@ -66,27 +68,17 @@ class TaroHomePage : ComponentActivity() {
             Triple("13", "June", "Sunday")
         )
 
-
-
         val concatenatedList = mutableListOf<Triple<String, String, String>>().apply {
             (dayContext?.get("PreviousDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
             (dayContext?.get("UpcomingDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
         }
         Log.e("ConcatenatedList",concatenatedList.size.toString())
-        val taskListDummyData = listOf(
-            Pair("Task1",false),
-            Pair("Task2",false),
-            Pair("Task3",false),
-            Pair("Task4",false),
-            Pair("Task5",false),
-            Pair("Task6",false),
-            Pair("Task7",false),
-            Pair("Task8",false),
-            Pair("Task9",false),
-            Pair("Task10",false)
 
+        /** Auto Generate Tasks  to the Database **/
+        CoroutineScope(Dispatchers.IO).launch{
+        }
 
-        )
+        /**Mocking Database **/
 
         DateComposeRecyclerView = findViewById(R.id.DateRecyclerView);
         adapter = DateCardAdapter(concatenatedList);
@@ -95,13 +87,16 @@ class TaroHomePage : ComponentActivity() {
         DateComposeRecyclerView.adapter = adapter;
 
 
-
         TaskListRecyclerView = findViewById(R.id.TaskListRecyclerView);
-        TaskListAdapter = TaskListComposeAdapter(taskListDummyData);
 
         TaskListRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
-        TaskListRecyclerView.adapter = TaskListAdapter
 
+        mockFetch(this) { dummyData ->
+            // Now you can use taskListDummyData here
+            // You can now pass this to your adapter or whatever you need
+            TaskListAdapter = TaskListComposeAdapter(dummyData);
+            TaskListRecyclerView.adapter = TaskListAdapter
+        }
 
         /* Deleted Welcome Message
 
@@ -171,4 +166,36 @@ fun generateDayContext(amount: Long) : MutableMap<String,MutableList<Triple<Stri
     return  generatedContext;
 
 
+}
+
+/** Adds Tasks to the Database **/
+@RequiresApi(Build.VERSION_CODES.O)
+suspend fun mockDatabase(context: Context) {
+    val taskManager = TaroTasksManager()
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val formattedDueDate = LocalDateTime.now().format(formatter)
+
+    val taskList = listOf(
+        UserTaskDb(name = "Do Dishes", difficulty = 2, priority = 5, urgency = 3, expectedDuration = 0.5, isCompleted = false, dueDate = formattedDueDate),
+        UserTaskDb(name = "Linear", difficulty = 5, priority = 5, urgency = 4, expectedDuration = 2.5, isCompleted = false, dueDate = formattedDueDate),
+
+        UserTaskDb(name = "Gym Workout", difficulty = 5, priority = 5, urgency = 2, expectedDuration = 3.5, isCompleted = false, dueDate = formattedDueDate),
+    )
+
+    withContext(Dispatchers.IO) {
+        taskManager.insertUserTasks(context, taskList)
+    }
+}
+
+fun mockFetch(context: Context, callback: (List<Pair<String, Boolean>>) -> Unit) {
+    val taskManager = TaroTasksManager()
+
+    CoroutineScope(Dispatchers.IO).launch {
+        val tasks = taskManager.getTasksByDate(context,"2025-05-05")
+        val dummyData = tasks.map { it.name to it.isCompleted }
+
+        withContext(Dispatchers.Main) {
+            callback(dummyData) // Return to caller on Main thread
+        }
+    }
 }

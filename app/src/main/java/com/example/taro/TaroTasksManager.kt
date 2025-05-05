@@ -1,21 +1,24 @@
 package com.example.taro
 
 import android.content.Context
+import android.util.Log
 import com.example.taro.Dao.TaroDb
 import com.example.taro.Dao.UserTaskDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class TaroTasksManager {
 
     fun insertUserTasks(context: Context, userTasks : List<UserTaskDb>){
         CoroutineScope(Dispatchers.IO).launch {
             // before inserting take the task information and generate the score
-
             val dao = (context.applicationContext as TaroApplication).db.taroDao()
             //spread operator for vararg
             dao.insertAll(*userTasks.toTypedArray())
+
+            Log.e("DATABASE","completed insertion")
         }
     }
 
@@ -43,6 +46,15 @@ class TaroTasksManager {
         }
     }
 
+    suspend fun getTasksByDate(context: Context, date: String): List<UserTaskDb> {
+        val dao = (context.applicationContext as TaroApplication).db.taroDao()
+        return dao.fetchTasksByDate(date)
+    }
+
+    suspend fun getAllTasks(context: Context) : List<UserTaskDb>{
+        val dao = (context.applicationContext as TaroApplication).db.taroDao()
+        return dao.getAllTasks();
+    }
     /** Returns a Scalar and creates the wanted score **/
     private fun generateTaskScore(task:UserTaskDb, moodMultiplier : Int , totalTasks : Int): Double {
 
