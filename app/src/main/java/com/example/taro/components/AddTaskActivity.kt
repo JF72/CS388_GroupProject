@@ -1,5 +1,6 @@
 package com.example.taro.components
 
+import android.graphics.Paint.Align
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Slider
@@ -27,74 +29,212 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.taro.UserTaskDb
 
 
+enum class TaskFormPage{
+    Description, Details
+}
+
 @Composable
-@Preview
-fun AddTaskActivity(
-    //TODO SQL UPLOAD NEEDS TO BE MADE
-    ){
+fun AddTaskPopUp(onDismissRequest: () -> Unit) {
+    var currentPage by remember { mutableStateOf(TaskFormPage.Description) }
+
+    // Shared state
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var dueDate by remember { mutableStateOf("") }
+
     var difficulty by remember { mutableStateOf(0) }
     var priority by remember { mutableStateOf(0) }
     var urgency by remember { mutableStateOf(0) }
     var expectedDuration by remember { mutableStateOf(0.0) }
-    var dueDate by remember { mutableStateOf("") }
     var isCompleted by remember { mutableStateOf(false) }
-    var taroScore by remember { mutableStateOf(0.0) }
 
-    Column(
-        modifier = Modifier
-            .background(Color.White)
-            .padding(16.dp)
-            .widthIn(min = 320.dp)
-    ){
+    Dialog(onDismissRequest = onDismissRequest) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF00FF9D))
-                .padding(8.dp)
-        ){
+                .background(Color.White)
+                .padding(24.dp)
+                .widthIn(min = 320.dp)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                when (currentPage) {
+                    TaskFormPage.Description -> {
+                        Text("Create Task", fontSize = 20.sp)
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        androidx.compose.material3.OutlinedTextField(
+                            value = name,
+                            onValueChange = { name = it },
+                            label = { Text("Task Name*") }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        androidx.compose.material3.OutlinedTextField(
+                            value = description,
+                            onValueChange = { description = it },
+                            label = { Text("Description (optional)") }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        androidx.compose.material3.OutlinedTextField(
+                            value = dueDate,
+                            onValueChange = { dueDate = it },
+                            label = { Text("Due Date (optional)") }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        androidx.compose.material3.Button(
+                            onClick = {
+                                if (name.isNotBlank()) {
+                                    currentPage = TaskFormPage.Details
+                                }
+                            }
+                        ) {
+                            Text("Next")
+                        }
+                    }
+
+                    TaskFormPage.Details -> {
+                        AddTaskActivity(
+                            difficulty = difficulty,
+                            onDifficultyChange = { difficulty = it },
+                            priority = priority,
+                            onPriorityChange = { priority = it },
+                            urgency = urgency,
+                            onUrgencyChange = { urgency = it },
+                            expectedDuration = expectedDuration,
+                            onDurationChange = { expectedDuration = it }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row {
+                            androidx.compose.material3.TextButton(
+                                onClick = { currentPage = TaskFormPage.Description }
+                            ) {
+                                Text("Back")
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            androidx.compose.material3.Button(
+                                onClick = {
+                                    val task = UserTaskDb(
+                                        uid = (0..999999).random(),
+                                        name = name,
+                                        description = description,
+                                        difficulty = difficulty,
+                                        priority = priority,
+                                        urgency = urgency,
+                                        dueDate = dueDate, // parse later
+                                        isCompleted = isCompleted,
+                                        taroScore = expectedDuration
+                                    )
+                                    println("Saving task: $task")
+                                    onDismissRequest()
+                                }
+                            ) {
+                                Text("Save")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+@Composable
+// @Preview
+fun AddTaskActivity(
+    difficulty: Int,
+    onDifficultyChange: (Int) -> Unit,
+    priority: Int,
+    onPriorityChange: (Int) -> Unit,
+    urgency: Int,
+    onUrgencyChange: (Int) -> Unit,
+    expectedDuration: Double,
+    onDurationChange: (Double) -> Unit
+
+) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .background(Color.White)
+                .padding(16.dp)
+                .widthIn(min = 320.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF00FF9D))
+                    .padding(8.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = "Add your task",
+                    fontSize = 20.sp,
+                    color = Color.Black
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            RatingRow("How Challenging is this task?", difficulty, onDifficultyChange)
+            RatingRow("How Important is this task?", priority, onPriorityChange)
+            RatingRow("How soon must the task be done?", urgency, onUrgencyChange)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("Time needed to complete the task")
+
+            Slider(
+                value = expectedDuration.toFloat(),
+                onValueChange = { onDurationChange(it.toDouble()) },
+                valueRange = 1f..12f,
+                steps = 10,
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF00FF9D),
+                    activeTrackColor = Color(0xFF00BFFF),
+                    inactiveTrackColor = Color.LightGray
+                )
+            )
+
             Text(
-                text = "Add your task",
-                fontSize = 20.sp,
-                color = Color.Black
+                text = "${expectedDuration.toInt()} hours",
+                fontStyle = FontStyle.Italic,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        RatingRow("How Challenging is this task?", difficulty) { difficulty = it }
-        RatingRow("How Important is this task?", priority) { priority = it }
-        RatingRow("How soon must the task be done?", urgency) { urgency = it }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Time needed to complete the task")
-
-        Slider(
-            value = expectedDuration.toFloat(),
-            onValueChange = { expectedDuration = it.toDouble() },
-            valueRange = 1f..12f,
-            steps = 10,
-            colors = SliderDefaults.colors(
-                thumbColor = Color(0xFF00FF9D),
-                activeTrackColor = Color(0xFF00BFFF),
-                inactiveTrackColor = Color.LightGray
-            )
-        )
-
-        Text(
-            text = "${expectedDuration.toInt()} hours",
-            fontStyle = FontStyle.Italic,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
     }
 }
 
 
 @Composable
-fun RatingRow(label: String, rating: Int, onRatingChange: (Int) -> Unit) {
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+fun RatingRow(
+    label: String,
+    rating: Int,
+    onRatingChange: (Int) -> Unit
+){
+    Column(modifier = Modifier
+        .padding(vertical = 8.dp)
+        .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(text = label)
 
         Row(modifier = Modifier.padding(top = 4.dp)) {
@@ -108,6 +248,8 @@ fun RatingRow(label: String, rating: Int, onRatingChange: (Int) -> Unit) {
                         .background(if (filled) Color(0xFF00EFFF) else Color.Transparent)
                         .border(1.dp, Color(0xFF00EFFF), CircleShape)
                         .clickable { onRatingChange(i) }
+
+
                 )
             }
         }

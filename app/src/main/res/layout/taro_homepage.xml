@@ -17,6 +17,13 @@
         android:layout_height="match_parent"/>
 
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/taskAddPopUp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/DateRecyclerView"
         android:layout_width="408dp"
