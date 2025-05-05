@@ -23,6 +23,7 @@ class TaskAdapter(
         val completeTaskButton: Button = itemView.findViewById(R.id.completeTaskButton)
         val editTaskButton: Button = itemView.findViewById(R.id.editTaskButton) // <-- Add this to XML
 
+
         fun bind(task: UserTask) {
             taskName.text = task.name
             taskPoints.text = "Points: ${task.points}"
@@ -56,6 +57,8 @@ class TaskAdapter(
                 onTaskClicked(task)
             }
         }
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
