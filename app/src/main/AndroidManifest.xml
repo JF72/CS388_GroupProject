@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name =".TaroApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -37,6 +38,7 @@
         <activity android:name=".TaroCreateGroupPage" />
         <activity android:name=".TaroJoinGroupPage" />
         <activity android:name=".TaroStatsPage" />
+        <activity android:name=".EditTaskActivity" />
 
 
 
