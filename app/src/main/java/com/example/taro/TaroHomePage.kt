@@ -8,8 +8,18 @@ import android.util.Log
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,12 +50,33 @@ class TaroHomePage : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.taro_homepage)
 
-        var showAddTaskPopUp = true;
+        var showAddTaskPopUp = false;
 
         var taskPopUpComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.taskAddPopUp)
         val headerComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.headerNavBar)
         headerComposeView.setContent {
             com.example.taro.components.HeaderBar()
+        }
+        val initializeTaskPopUp = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.initializePopUp)
+        initializeTaskPopUp.setContent{
+            Box(modifier = Modifier.fillMaxSize()) {
+                FloatingActionButton(
+                    onClick = {
+                        // Trigger dialog or new task popup
+                        taskPopUpComposeView.setContent {
+                            AddTaskPopUp(onDismissRequest = {
+                                taskPopUpComposeView.setContent {}
+                            })
+                        }
+                    },
+                    containerColor = Color(0xFF00BFFF),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(24.dp)
+                ) {
+                    Text("+", fontSize = 24.sp, color = Color.White)
+                }
+            }
         }
 
         super.onCreate(savedInstanceState)
