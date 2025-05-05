@@ -20,7 +20,7 @@ data class UserTaskDb(
     @ColumnInfo(name="urgency") val urgency : Int,
 
     /** Date Object for ease of retrieval */
-    @ColumnInfo(name="dueDate") val dueDate : LocalDateTime,
+    @ColumnInfo(name="dueDate") val dueDate : String?,
 
     @ColumnInfo(name="isCompleted") val isCompleted : Boolean,
 
