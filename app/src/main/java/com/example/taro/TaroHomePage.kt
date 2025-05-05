@@ -45,7 +45,7 @@ class TaroHomePage : ComponentActivity() {
 
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        BottomNav.setupBottomNav(bottomNavView, this)
+        /**BottomNav.setupBottomNav(bottomNavView, this) **/
         bottomNavView.selectedItemId = R.id.nav_home
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
