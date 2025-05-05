@@ -25,16 +25,16 @@ class EditTaskActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.taro_task_creation)
-
-        taskNameInput = findViewById(R.id.taskNameInput)
-        taskDescriptionInput = findViewById(R.id.taskDescriptionInput)
-        dueDateButton = findViewById(R.id.dueDateButton)
-        saveEditButton = findViewById(R.id.saveTaskButton) // we’ll rename this button label dynamically
-        timeEstimateSeekbar = findViewById(R.id.timeEstimateSeekbar)
-        difficultySeekbar = findViewById(R.id.difficultySeekbar)
-        prioritySeekbar = findViewById(R.id.prioritySeekbar)
-        physicalEffortSeekbar = findViewById(R.id.physicalEffortSeekbar)
+//        setContentView(R.layout.taro_task_creation)
+//
+//        taskNameInput = findViewById(R.id.taskNameInput)
+//        taskDescriptionInput = findViewById(R.id.taskDescriptionInput)
+//        dueDateButton = findViewById(R.id.dueDateButton)
+//        saveEditButton = findViewById(R.id.saveTaskButton) // we’ll rename this button label dynamically
+//        timeEstimateSeekbar = findViewById(R.id.timeEstimateSeekbar)
+//        difficultySeekbar = findViewById(R.id.difficultySeekbar)
+//        prioritySeekbar = findViewById(R.id.prioritySeekbar)
+//        physicalEffortSeekbar = findViewById(R.id.physicalEffortSeekbar)
 
         taskId = intent.getStringExtra("taskId")
         loadTaskData()

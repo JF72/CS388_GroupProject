@@ -34,6 +34,16 @@ class MainActivity : ComponentActivity() {
         val YesBtn = findViewById<Button>(R.id.YesBtn);
         val NoBtn = findViewById<Button>(R.id.NoBtn);
 
+
+        val homeIntent = Intent(this,TaroHomePage::class.java)
+        NoBtn.setOnClickListener{
+            startActivity(homeIntent)
+        }
+        YesBtn.setOnClickListener{
+            startActivity(homeIntent)
+        }
+
+        /** Overwriting for testing purposes
         NoBtn.setOnClickListener{
             setContentView(TaroQuotesView);
             val intent1 = Intent(this, TaroLogin::class.java)
@@ -43,7 +53,7 @@ class MainActivity : ComponentActivity() {
             val intent = Intent(this, TaroRegister::class.java)
             startActivity((intent))
 
-        }
+        } **/
     }
 
     override fun onStart() {
