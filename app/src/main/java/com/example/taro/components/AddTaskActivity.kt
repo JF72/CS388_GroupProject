@@ -3,6 +3,7 @@ package com.example.taro.components
 import android.content.Context
 import android.graphics.Paint.Align
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,22 +37,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.taro.Dao.UserTaskDb
 import com.example.taro.TaroTasksManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.logging.SimpleFormatter
 
 
 enum class TaskFormPage{
     Description, Details
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddTaskPopUp(onDismissRequest: () -> Unit) {
     var currentPage by remember { mutableStateOf(TaskFormPage.Description) }
@@ -59,7 +69,7 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
     // Shared state
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var dueDate by remember {mutableStateOf<Long?>(null) }
+    var dueDate by remember {mutableStateOf<String?>(null) }
     var showDatePickerModal by remember { mutableStateOf(false) }
 
     var difficulty by remember { mutableStateOf(0) }
@@ -67,6 +77,10 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
     var urgency by remember { mutableStateOf(0) }
     var expectedDuration by remember { mutableStateOf(0.0) }
     var isCompleted by remember { mutableStateOf(false) }
+
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+    val context = LocalContext.current;
 
     Dialog(onDismissRequest = onDismissRequest) {
         Box(
@@ -101,9 +115,25 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
                         }
                         if(showDatePickerModal){
                             DatePickerModal(
-                                onDateSelected = {dueDate = it
-                                showDatePickerModal = false
-                                                 },
+                                onDateSelected = { timeStamp : Long? ->
+                                    timeStamp.let {
+                                        val date = it?.let { it1 ->
+                                            Instant.ofEpochMilli(it1)
+                                                .atZone(ZoneOffset.UTC)
+                                                .toLocalDate()
+                                        }
+
+                                        val formattedDate = date?.format(formatter);
+                                        if (formattedDate != null) {
+                                            Log.d("DATESELECTED",formattedDate)
+                                        }
+                                        dueDate = formattedDate;
+                                    }
+
+                                    showDatePickerModal = false
+                                },
+
+
                                 onDismiss = { showDatePickerModal= false}
                             )
                         }
@@ -152,11 +182,17 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
                                         difficulty = difficulty,
                                         priority = priority,
                                         urgency = urgency,
-                                        //dueDate = dueDate, // parse later
+                                        dueDate = dueDate,
                                         isCompleted = isCompleted,
                                         expectedDuration = expectedDuration
                                     )
                                     println("Saving task: $task")
+
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        //Adding To Db
+                                        addTaskToDb(context,task);
+
+                                    }
                                     onDismissRequest()
                                 }
                             ) {
@@ -180,7 +216,6 @@ suspend  fun addTaskToDb(context : Context, newTask: UserTaskDb){
     withContext(Dispatchers.IO){
         taskManager.insertUserTasks(context,taskListHolder);
     }
-
 }
 
 
@@ -319,3 +354,4 @@ fun DatePickerModal(
         DatePicker(state = datePickerState)
     }
 }
+
