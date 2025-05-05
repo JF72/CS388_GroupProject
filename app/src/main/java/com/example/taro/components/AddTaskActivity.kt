@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.taro.UserTaskDb
+import com.example.taro.Dao.UserTaskDb
 
 
 enum class TaskFormPage{
@@ -124,7 +124,6 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
                             androidx.compose.material3.Button(
                                 onClick = {
                                     val task = UserTaskDb(
-                                        uid = (0..999999).random(),
                                         name = name,
                                         description = description,
                                         difficulty = difficulty,
@@ -132,7 +131,7 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
                                         urgency = urgency,
                                         dueDate = dueDate, // parse later
                                         isCompleted = isCompleted,
-                                        taroScore = expectedDuration
+                                        expectedDuration = expectedDuration
                                     )
                                     println("Saving task: $task")
                                     onDismissRequest()
