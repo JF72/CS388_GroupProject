@@ -15,14 +15,12 @@ class TaroLogin : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.taro_login)
 
-        // Link views to code
         val emailInput = findViewById<EditText>(R.id.email_input)
         val nextButton = findViewById<Button>(R.id.logIn_next_btn)
 
         val googleBtn = findViewById<LinearLayout>(R.id.googleBtn)
         val facebookBtn = findViewById<LinearLayout>(R.id.facebookBtn)
 
-        // Next button functionality
         nextButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
             if (email.isEmpty()) {
@@ -43,6 +41,7 @@ class TaroLogin : AppCompatActivity() {
             startActivity(intent)
         }
 
+        //Gotta remove this at some point
         googleBtn.setOnClickListener {
             Toast.makeText(this, "Google Login not implemented yet.", Toast.LENGTH_SHORT).show()
         }

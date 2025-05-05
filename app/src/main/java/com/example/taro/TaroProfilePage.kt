@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -16,6 +17,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TaroProfilePage : ComponentActivity() {
 
@@ -27,7 +32,6 @@ class TaroProfilePage : ComponentActivity() {
     private lateinit var groupAdapter: GroupAdapter
     private val groupList = mutableListOf<UserGroup>()
 
-
     private val PICK_IMAGE_REQUEST = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +42,7 @@ class TaroProfilePage : ComponentActivity() {
         groupsRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         groupAdapter = GroupAdapter(groupList)
         groupsRecyclerView.adapter = groupAdapter
+
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         BottomNav.setupBottomNav(bottomNavView, this)
         bottomNavView.selectedItemId = R.id.nav_profile
@@ -53,6 +58,7 @@ class TaroProfilePage : ComponentActivity() {
         changePhotoButton.setOnClickListener {
             openImagePicker()
         }
+
         val createGroupButton = findViewById<Button>(R.id.createGroupButton)
         val joinGroupButton = findViewById<Button>(R.id.joinGroupButton)
 
@@ -68,27 +74,25 @@ class TaroProfilePage : ComponentActivity() {
 
         val logoutButton = findViewById<Button>(R.id.logoutButton)
         logoutButton.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, TaroLogin::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-        }
-        /*val generateDataButton = findViewById<Button>(R.id.generateDataButton)
-        generateDataButton.setOnClickListener {
-            val userId = FirebaseAuth.getInstance().currentUser?.uid
-            if (userId != null) {
-                DevDataGenerator.generateDummyTasks(this, userId, weeks = 4, tasksPerWeek = 5)
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    FirebaseAuth.getInstance().signOut()
+                }
+
+                delay(100) // allow UI to settle
+
+                val intent = Intent(this@TaroProfilePage, TaroLogin::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
             }
-        }*/
-
-
+        }
     }
+
     override fun onResume() {
         super.onResume()
         loadUserGroups()
     }
-
 
     private fun loadProfileData() {
         val db = FirebaseFirestore.getInstance()
@@ -112,7 +116,6 @@ class TaroProfilePage : ComponentActivity() {
                     pointsText.text = "Points: $totalPoints"
                 }
 
-            // Fetch tasks to count completed vs total
             db.collection("users")
                 .document(userId)
                 .collection("tasks")
@@ -178,6 +181,7 @@ class TaroProfilePage : ComponentActivity() {
                 }
             }
     }
+
     private fun loadUserGroups() {
         val db = FirebaseFirestore.getInstance()
         val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -203,5 +207,4 @@ class TaroProfilePage : ComponentActivity() {
                 }
         }
     }
-
 }
