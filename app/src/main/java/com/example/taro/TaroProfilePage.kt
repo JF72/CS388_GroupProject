@@ -38,9 +38,7 @@ class TaroProfilePage : ComponentActivity() {
         groupsRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         groupAdapter = GroupAdapter(groupList)
         groupsRecyclerView.adapter = groupAdapter
-        val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        BottomNav.setupBottomNav(bottomNavView, this)
-        bottomNavView.selectedItemId = R.id.nav_profile
+
 
         pointsText = findViewById(R.id.pointsText)
         completedTasksText = findViewById(R.id.completedTasksText)

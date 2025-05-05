@@ -37,12 +37,12 @@ class TaroStatsPage : ComponentActivity(), OnChartValueSelectedListener {
             stats?.let { displayWeeklyStats(it) }
             backButton.visibility = Button.GONE
         }
-
+        /*
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         BottomNav.setupBottomNav(bottomNavView, this)
         bottomNavView.selectedItemId = R.id.nav_statistics
-
-        loadAndAnalyzeTasks()
+        */
+        /*loadAndAnalyzeTasks()*/
     }
 
     private fun loadAndAnalyzeTasks() {
