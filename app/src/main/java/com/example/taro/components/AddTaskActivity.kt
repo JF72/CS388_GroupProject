@@ -1,6 +1,9 @@
 package com.example.taro.components
 
+import android.content.Context
 import android.graphics.Paint.Align
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,9 +18,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.taro.Dao.UserTaskDb
+import com.example.taro.TaroTasksManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 enum class TaskFormPage{
@@ -44,7 +59,8 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
     // Shared state
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var dueDate by remember { mutableStateOf("") }
+    var dueDate by remember {mutableStateOf<Long?>(null) }
+    var showDatePickerModal by remember { mutableStateOf(false) }
 
     var difficulty by remember { mutableStateOf(0) }
     var priority by remember { mutableStateOf(0) }
@@ -80,11 +96,18 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        androidx.compose.material3.OutlinedTextField(
-                            value = dueDate,
-                            onValueChange = { dueDate = it },
-                            label = { Text("Due Date (optional)") }
-                        )
+                        Button(onClick = {showDatePickerModal = true}) {
+                            Text("Pick Due Date : Optional")
+                        }
+                        if(showDatePickerModal){
+                            DatePickerModal(
+                                onDateSelected = {dueDate = it
+                                showDatePickerModal = false
+                                                 },
+                                onDismiss = { showDatePickerModal= false}
+                            )
+                        }
+
                         Spacer(modifier = Modifier.height(16.dp))
 
                         androidx.compose.material3.Button(
@@ -129,7 +152,7 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
                                         difficulty = difficulty,
                                         priority = priority,
                                         urgency = urgency,
-                                        dueDate = dueDate, // parse later
+                                        //dueDate = dueDate, // parse later
                                         isCompleted = isCompleted,
                                         expectedDuration = expectedDuration
                                     )
@@ -145,6 +168,19 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
             }
         }
     }
+}
+
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+suspend  fun addTaskToDb(context : Context, newTask: UserTaskDb){
+    val taskManager = TaroTasksManager()
+
+    val taskListHolder : List<UserTaskDb> = listOf(newTask)
+    withContext(Dispatchers.IO){
+        taskManager.insertUserTasks(context,taskListHolder);
+    }
+
 }
 
 
@@ -252,5 +288,34 @@ fun RatingRow(
                 )
             }
         }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                onDateSelected(datePickerState.selectedDateMillis)
+                onDismiss()
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
     }
 }
