@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taro.Adapters.TaskListComposeAdapter
 import kotlinx.coroutines.*
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDateTime
 import java.time.format.TextStyle
@@ -35,6 +34,10 @@ class TaroHomePage : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.taro_homepage)
+        val headerComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.headerNavBar)
+        headerComposeView.setContent {
+            com.example.taro.components.HeaderBar()
+        }
 
         super.onCreate(savedInstanceState)
 
@@ -42,11 +45,6 @@ class TaroHomePage : ComponentActivity() {
             /** Default 30 days*/
         dayContext =  generateDayContext(5) ;
 
-
-
-        val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        BottomNav.setupBottomNav(bottomNavView, this)
-        bottomNavView.selectedItemId = R.id.nav_home
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
 
