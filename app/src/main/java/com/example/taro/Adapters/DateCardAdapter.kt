@@ -6,7 +6,7 @@ import com.example.taro.R
 import com.example.taro.components.DateCard
 
 class DateCardAdapter(
-    private val items: MutableList<Triple<String, String, String>>,
+    val items: MutableList<Triple<String, String, String>>,
     private var selectedDate: Int = 5,
     private val onDateSelected: (Int, Triple<String,String,String>) -> Unit
 ) : RecyclerView.Adapter<DateCardAdapter.DateCardViewHolder>() {
@@ -15,9 +15,6 @@ class DateCardAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DateCardViewHolder {
         return DateCardViewHolder(ComposeView(parent.context))
-//        // Inflate ComposeView and pass it to the ViewHolder
-//        val composeView = ComposeView(parent.context)
-//        return DateCardViewHolder(composeView)
     }
 
     override fun onBindViewHolder(holder: DateCardViewHolder, position: Int) {
@@ -36,4 +33,11 @@ class DateCardAdapter(
     }
 
     override fun getItemCount() = items.size
+
+    fun updateItems(newItems: List<Triple<String, String, String>>, newSelected: Int) {
+        items.clear()
+        items.addAll(newItems)
+        selectedDate = newSelected
+        notifyDataSetChanged()
+    }
 }

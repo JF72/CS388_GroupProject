@@ -29,6 +29,7 @@ import com.example.taro.Dao.UserTaskDb
 import kotlinx.coroutines.*
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -38,6 +39,7 @@ class TaroHomePage : ComponentActivity() {
     private lateinit var welcomeText: TextView
     private lateinit var DateComposeRecyclerView : RecyclerView
     private lateinit var adapter : DateCardAdapter
+
     private val taroManager : TaroTasksManager = TaroTasksManager()
     /** List Item Recycler View */
     private lateinit var  TaskListRecyclerView : RecyclerView
@@ -46,10 +48,21 @@ class TaroHomePage : ComponentActivity() {
     /** By Default it will hold the Previous and After 30 days. */
     private var dayContext: MutableMap<String, MutableList<Triple<String, String, String>>>? = null
 
+    private fun centerOnDate(position: Int) {
+        val itemWidthPx = (64 * resources.displayMetrics.density).toInt()
+        val screenWidth = resources.displayMetrics.widthPixels
+        val offset = (screenWidth / 2) - (itemWidthPx / 2)
+
+        (DateComposeRecyclerView.layoutManager as? LinearLayoutManager)
+            ?.scrollToPositionWithOffset(position, offset)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.taro_homepage)
 
+        val today = LocalDateTime.now()
+        val dayCards = generateDayContext(today).toMutableList()
 
         var taskPopUpComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.taskAddPopUp)
         val headerComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.headerNavBar)
@@ -81,33 +94,11 @@ class TaroHomePage : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         /** Default 30 days*/
-
-
-
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-
         /**
          *  Created A list of Triples based on the Previews 30 days and the Upcoming 30 Days
          *  It most Have : Month , DateNumber, Day of the Week
          */
-
-//
-//        val data = mutableListOf(
-//            Triple("11", "April", "Friday"),
-//            Triple("12", "May", "Saturday"),
-//            Triple("13", "June", "Sunday"),
-//            Triple("13", "June", "Sunday"),
-//            Triple("13", "June", "Sunday"),
-//            Triple("13", "June", "Sunday"),
-//            Triple("13", "June", "Sunday")
-//        )
-
-//        val concatenatedList = mutableListOf<Triple<String, String, String>>().apply {
-//            (dayContext?.get("PreviousDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
-//            (dayContext?.get("UpcomingDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
-//        }
-//        Log.e("ConcatenatedList",concatenatedList.size.toString())
 
         /** Auto Generate Tasks  to the Database **/
         CoroutineScope(Dispatchers.IO).launch{
@@ -116,37 +107,63 @@ class TaroHomePage : ComponentActivity() {
         /**Mocking Database **/
 
         DateComposeRecyclerView = findViewById(R.id.DateRecyclerView);
-//        adapter = DateCardAdapter(concatenatedList);
-        val dayCards = generateDayContext().toMutableList()
+
         adapter = DateCardAdapter(
             items = dayCards,
-            selectedDate = 5 // Today
-        ) { index, selectedDateTriple ->
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val selectedDate = LocalDateTime.now().plusDays(index - 5L).format(formatter)
+            selectedDate = 5 // Initial center index
+        ) { index, _ ->
+            // Calculate the new center date from the clicked card
+            val oldCenterDate = adapter.items[5] // Middle item before update
+            val daysFromNow = index - 5L
+            val newCenterDate = generateDateFromTriple(oldCenterDate).plusDays(daysFromNow)
 
-            // Fetch tasks for this specific date
-//            mockFetch(this, selectedDate) { taskData ->
-//                TaskListAdapter = TaskListComposeAdapter(taskData)
-//                TaskListRecyclerView.adapter = TaskListAdapter
-//            }
+            // Generate new 11-day window around the selected date
+            val newDayCards = generateDayContext(newCenterDate)
+
+            // Update adapter with new list and reselect center item
+            adapter.updateItems(newDayCards, 5)
+
+            // Recenter scroll view
+            DateComposeRecyclerView.post {
+                centerOnDate(5)
+            }
+
+            // Fetch and display tasks for the new selected date
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val selectedDate = newCenterDate.format(formatter)
+
+            mockFetch(this, selectedDate) { taskData ->
+                TaskListAdapter = TaskListComposeAdapter(taskData)
+                TaskListRecyclerView.adapter = TaskListAdapter
+            }
         }
+
+
+
 
 
         DateComposeRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         DateComposeRecyclerView.adapter = adapter;
 
+        val selectedIndex = 5
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        DateComposeRecyclerView.layoutManager = layoutManager
+        DateComposeRecyclerView.adapter = adapter
+
+        DateComposeRecyclerView.post {
+            val itemWidthPx = (64 * resources.displayMetrics.density).toInt()
+            val screenWidth = resources.displayMetrics.widthPixels
+            val offset = (screenWidth / 2) - (itemWidthPx / 2)
+            (DateComposeRecyclerView.layoutManager as? LinearLayoutManager)
+                ?.scrollToPositionWithOffset(5, offset)
+        }
+
+
+
 
         TaskListRecyclerView = findViewById(R.id.TaskListRecyclerView);
 
         TaskListRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
-
-        mockFetch(this) { dummyData ->
-            // Now you can use taskListDummyData here
-            // You can now pass this to your adapter or whatever you need
-            TaskListAdapter = TaskListComposeAdapter(dummyData);
-            TaskListRecyclerView.adapter = TaskListAdapter
-        }
 
         /* Deleted Welcome Message
 
@@ -173,19 +190,25 @@ class TaroHomePage : ComponentActivity() {
 
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
-fun generateDayContext() : List<Triple<String, String, String>> {
-    val today = LocalDateTime.now()
+fun generateDateFromTriple(triple: Triple<String, String, String>): LocalDateTime {
+    val day = triple.first.toInt()
+    val month = Month.valueOf(triple.second.uppercase(Locale.getDefault()))
+    val year = LocalDateTime.now().year
+    return LocalDateTime.of(year, month, day, 0, 0)
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun generateDayContext(centerDate: LocalDateTime): List<Triple<String, String, String>> {
     val fullList = mutableListOf<Triple<String, String, String>>()
 
-    /** Might need performance update*/
-    for (i in -5..5 ){
-        val date = today.plusDays(i.toLong())
+    for (i in -5..5) {
+        val date = centerDate.plusDays(i.toLong())
         val month = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
         val day = date.dayOfMonth.toString().padStart(2, '0')
         val weekday = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
         fullList.add(Triple(day, month, weekday))
-
     }
     return fullList
 }
@@ -209,15 +232,19 @@ suspend fun mockDatabase(context: Context) {
     }
 }
 
-fun mockFetch(context: Context, callback: (List<Pair<String, Boolean>>) -> Unit) {
+
+
+fun mockFetch(context: Context, date: String, callback: (List<Pair<String, Boolean>>) -> Unit)
+{
     val taskManager = TaroTasksManager()
 
     CoroutineScope(Dispatchers.IO).launch {
-        val tasks = taskManager.getTasksByDate(context,"2025-05-05")
+        val tasks = taskManager.getTasksByDate(context, date)
         val dummyData = tasks.map { it.name to it.isCompleted }
 
         withContext(Dispatchers.Main) {
-            callback(dummyData) // Return to caller on Main thread
+            callback(dummyData)
         }
     }
+
 }
