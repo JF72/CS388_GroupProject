@@ -1,6 +1,7 @@
 package com.example.taro.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -13,19 +14,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@Preview
+//@Preview
 @Composable
 fun DateCard(
-    day: String = "Sunday",
-    month: String = "April",
-    weekday: String =  "1"
+    day: String,
+    month: String,
+    weekday: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
+    val backgroundColor = if(isSelected) Color(0xFF2C6AFD) else Color(0xFFEFF4FF)
+    val textColor = if (isSelected) Color.White else Color.Black
+
     Card(
         modifier = Modifier
-            .size(width = 64.dp, height = 85.dp).padding(1.dp),
+            .size(width = 64.dp, height = 85.dp).padding(1.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2C6AFD)
+            containerColor = backgroundColor
         )
     ) {
         Column(
@@ -39,20 +46,23 @@ fun DateCard(
                 text = month,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.White
-            )
-            Text(
-                text = weekday,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = textColor
             )
             Text(
                 text = day,
-                fontSize = 11.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.White
+                color = textColor
             )
+            Text(
+                text = weekday,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+
         }
     }
 }
+
+

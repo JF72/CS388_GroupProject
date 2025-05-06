@@ -50,7 +50,6 @@ class TaroHomePage : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.taro_homepage)
 
-        var showAddTaskPopUp = false;
 
         var taskPopUpComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.taskAddPopUp)
         val headerComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.headerNavBar)
@@ -81,17 +80,9 @@ class TaroHomePage : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
+        /** Default 30 days*/
 
-        if(showAddTaskPopUp){
-            taskPopUpComposeView.setContent{
-                AddTaskPopUp (onDismissRequest = {
-                    taskPopUpComposeView.setContent {}
-                })
-            }
-        }
 
-            /** Default 30 days*/
-        dayContext =  generateDayContext(5) ;
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -101,22 +92,22 @@ class TaroHomePage : ComponentActivity() {
          *  It most Have : Month , DateNumber, Day of the Week
          */
 
+//
+//        val data = mutableListOf(
+//            Triple("11", "April", "Friday"),
+//            Triple("12", "May", "Saturday"),
+//            Triple("13", "June", "Sunday"),
+//            Triple("13", "June", "Sunday"),
+//            Triple("13", "June", "Sunday"),
+//            Triple("13", "June", "Sunday"),
+//            Triple("13", "June", "Sunday")
+//        )
 
-        val data = mutableListOf(
-            Triple("11", "April", "Friday"),
-            Triple("12", "May", "Saturday"),
-            Triple("13", "June", "Sunday"),
-            Triple("13", "June", "Sunday"),
-            Triple("13", "June", "Sunday"),
-            Triple("13", "June", "Sunday"),
-            Triple("13", "June", "Sunday")
-        )
-
-        val concatenatedList = mutableListOf<Triple<String, String, String>>().apply {
-            (dayContext?.get("PreviousDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
-            (dayContext?.get("UpcomingDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
-        }
-        Log.e("ConcatenatedList",concatenatedList.size.toString())
+//        val concatenatedList = mutableListOf<Triple<String, String, String>>().apply {
+//            (dayContext?.get("PreviousDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
+//            (dayContext?.get("UpcomingDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
+//        }
+//        Log.e("ConcatenatedList",concatenatedList.size.toString())
 
         /** Auto Generate Tasks  to the Database **/
         CoroutineScope(Dispatchers.IO).launch{
@@ -125,7 +116,22 @@ class TaroHomePage : ComponentActivity() {
         /**Mocking Database **/
 
         DateComposeRecyclerView = findViewById(R.id.DateRecyclerView);
-        adapter = DateCardAdapter(concatenatedList);
+//        adapter = DateCardAdapter(concatenatedList);
+        val dayCards = generateDayContext().toMutableList()
+        adapter = DateCardAdapter(
+            items = dayCards,
+            selectedDate = 5 // Today
+        ) { index, selectedDateTriple ->
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val selectedDate = LocalDateTime.now().plusDays(index - 5L).format(formatter)
+
+            // Fetch tasks for this specific date
+//            mockFetch(this, selectedDate) { taskData ->
+//                TaskListAdapter = TaskListComposeAdapter(taskData)
+//                TaskListRecyclerView.adapter = TaskListAdapter
+//            }
+        }
+
 
         DateComposeRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         DateComposeRecyclerView.adapter = adapter;
@@ -168,48 +174,20 @@ class TaroHomePage : ComponentActivity() {
     }
 }
 @RequiresApi(Build.VERSION_CODES.O)
-fun generateDayContext(amount: Long) : MutableMap<String,MutableList<Triple<String,String,String>>>{
-
-
+fun generateDayContext() : List<Triple<String, String, String>> {
     val today = LocalDateTime.now()
-
-    val previousDaysList : MutableList<Triple<String,String,String>> = mutableListOf() ;
-    val upcomingDaysList : MutableList<Triple<String,String,String>> = mutableListOf();
+    val fullList = mutableListOf<Triple<String, String, String>>()
 
     /** Might need performance update*/
-    for (i in 1..amount ){
-        val previousDate : LocalDateTime = today.minusDays(i);
-        val nextDate : LocalDateTime = today.plusDays(i);
-
-        val previousMonth : String = previousDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault());
-        val previousDayName : String =previousDate.dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault())
-        val previousDayNumber : String = previousDate.dayOfMonth.toString().padStart(2 )
-
-        val formattedPreviousDate : Triple<String,String,String> = Triple(previousMonth,previousDayName,previousDayNumber)
-
-
-        val upcomingMonths : String = nextDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault());
-        val upcomingDayName : String =nextDate.dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault())
-        val upcomingDayNumber : String = nextDate.dayOfMonth.toString().padStart(2 )
-
-        val formattedUpcomingDate :  Triple<String,String,String> = Triple(upcomingMonths,upcomingDayName,upcomingDayNumber)
-
-        previousDaysList.add(formattedPreviousDate);
-
-        upcomingDaysList.add(formattedUpcomingDate);
+    for (i in -5..5 ){
+        val date = today.plusDays(i.toLong())
+        val month = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+        val day = date.dayOfMonth.toString().padStart(2, '0')
+        val weekday = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+        fullList.add(Triple(day, month, weekday))
 
     }
-
-
-    val generatedContext: MutableMap<String, MutableList<Triple<String, String, String>>> = mutableMapOf();
-
-    generatedContext["PreviousDays"] = previousDaysList;
-    generatedContext["UpcomingDays"] = upcomingDaysList;
-    Log.e("Fucntion CAll",previousDaysList[0].toString())
-
-    return  generatedContext;
-
-
+    return fullList
 }
 
 /** Adds Tasks to the Database **/
