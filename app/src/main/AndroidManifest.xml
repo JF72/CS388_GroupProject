@@ -32,16 +32,17 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".TaroHomePage" />
         <activity android:name=".TaroProfilePage" />
-        <activity android:name=".TaroTasksPage" />
-        <activity android:name=".TaskCreation" />
+
         <activity android:name=".TaskDetailPage" />
         <activity android:name=".TaroCreateGroupPage" />
         <activity android:name=".TaroJoinGroupPage" />
         <activity android:name=".TaroStatsPage" />
         <activity android:name=".EditTaskActivity" />
-
-
-
+        <activity
+            android:name=".components.TaroPath.TaroPathPage"
+            android:exported="false"
+            android:label="Taro Path"
+            />
 
         <meta-data
             android:name="preloaded_fonts"

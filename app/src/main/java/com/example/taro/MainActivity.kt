@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.taro.components.TaroPath.TaroPath
+import com.example.taro.components.TaroPath.TaroPathPage
 import com.example.taro.ui.theme.TaroTheme
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -34,10 +36,12 @@ class MainActivity : ComponentActivity() {
         val YesBtn = findViewById<Button>(R.id.YesBtn);
         val NoBtn = findViewById<Button>(R.id.NoBtn);
 
-
         val homeIntent = Intent(this,TaroHomePage::class.java)
+
+        val taroPathIntent = Intent(this, TaroPathPage::class.java);
+
         NoBtn.setOnClickListener{
-            startActivity(homeIntent)
+            startActivity(taroPathIntent);
         }
         YesBtn.setOnClickListener{
             startActivity(homeIntent)
