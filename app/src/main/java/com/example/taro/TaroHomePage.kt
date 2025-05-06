@@ -2,30 +2,33 @@ package com.example.taro
 
 import DateCardAdapter
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taro.Adapters.TaskListComposeAdapter
 import com.example.taro.components.AddTaskPopUp
 import com.example.taro.Dao.UserTaskDb
+import com.example.taro.components.StartTasksButton
+import com.example.taro.components.TaroPath.TaroPathPage
 import kotlinx.coroutines.*
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDateTime
@@ -69,12 +72,28 @@ class TaroHomePage : ComponentActivity() {
         headerComposeView.setContent {
             com.example.taro.components.HeaderBar()
         }
+        val taroPathIntent = Intent(this, TaroPathPage::class.java);
+
         val initializeTaskPopUp = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.initializePopUp)
         initializeTaskPopUp.setContent{
+
             Box(modifier = Modifier.fillMaxSize()) {
+
+                // Centered StartTasksButton
+                LargeFloatingActionButton(
+                    onClick = { startActivity(taroPathIntent)},
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(24.dp),
+                    containerColor = Color(0xFF4DDEFD)
+
+                ) {
+                    Icon(Icons.Filled.PlayCircle, "Start Tasks")
+                }
+
+                // FloatingActionButton at the bottom end
                 FloatingActionButton(
                     onClick = {
-                        // Trigger dialog or new task popup
                         taskPopUpComposeView.setContent {
                             AddTaskPopUp(onDismissRequest = {
                                 taskPopUpComposeView.setContent {}
@@ -89,6 +108,9 @@ class TaroHomePage : ComponentActivity() {
                     Text("+", fontSize = 24.sp, color = Color.White)
                 }
             }
+
+
+
         }
 
         super.onCreate(savedInstanceState)
