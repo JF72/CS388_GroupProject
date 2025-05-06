@@ -29,6 +29,7 @@ import com.example.taro.Dao.UserTaskDb
 import kotlinx.coroutines.*
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -47,10 +48,21 @@ class TaroHomePage : ComponentActivity() {
     /** By Default it will hold the Previous and After 30 days. */
     private var dayContext: MutableMap<String, MutableList<Triple<String, String, String>>>? = null
 
+    private fun centerOnDate(position: Int) {
+        val itemWidthPx = (64 * resources.displayMetrics.density).toInt()
+        val screenWidth = resources.displayMetrics.widthPixels
+        val offset = (screenWidth / 2) - (itemWidthPx / 2)
+
+        (DateComposeRecyclerView.layoutManager as? LinearLayoutManager)
+            ?.scrollToPositionWithOffset(position, offset)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.taro_homepage)
 
+        val today = LocalDateTime.now()
+        val dayCards = generateDayContext(today).toMutableList()
 
         var taskPopUpComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.taskAddPopUp)
         val headerComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.headerNavBar)
@@ -96,20 +108,37 @@ class TaroHomePage : ComponentActivity() {
 
         DateComposeRecyclerView = findViewById(R.id.DateRecyclerView);
 
-        val dayCards = generateDayContext().toMutableList()
         adapter = DateCardAdapter(
             items = dayCards,
-            selectedDate = 5 // Today
-        ) { index, selectedDateTriple ->
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val selectedDate = LocalDateTime.now().plusDays(index - 5L).format(formatter)
+            selectedDate = 5 // Initial center index
+        ) { index, _ ->
+            // Calculate the new center date from the clicked card
+            val oldCenterDate = adapter.items[5] // Middle item before update
+            val daysFromNow = index - 5L
+            val newCenterDate = generateDateFromTriple(oldCenterDate).plusDays(daysFromNow)
 
-            // 🔥 Fetch tasks for this specific date
+            // Generate new 11-day window around the selected date
+            val newDayCards = generateDayContext(newCenterDate)
+
+            // Update adapter with new list and reselect center item
+            adapter.updateItems(newDayCards, 5)
+
+            // Recenter scroll view
+            DateComposeRecyclerView.post {
+                centerOnDate(5)
+            }
+
+            // Fetch and display tasks for the new selected date
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val selectedDate = newCenterDate.format(formatter)
+
             mockFetch(this, selectedDate) { taskData ->
                 TaskListAdapter = TaskListComposeAdapter(taskData)
                 TaskListRecyclerView.adapter = TaskListAdapter
             }
         }
+
+
 
 
 
@@ -136,13 +165,6 @@ class TaroHomePage : ComponentActivity() {
 
         TaskListRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
 
-//        mockFetch(this) { dummyData ->
-//            // Now you can use taskListDummyData here
-//            // You can now pass this to your adapter or whatever you need
-//            TaskListAdapter = TaskListComposeAdapter(dummyData);
-//            TaskListRecyclerView.adapter = TaskListAdapter
-//        }
-
         /* Deleted Welcome Message
 
         if (userId != null) {
@@ -168,19 +190,25 @@ class TaroHomePage : ComponentActivity() {
 
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
-fun generateDayContext() : List<Triple<String, String, String>> {
-    val today = LocalDateTime.now()
+fun generateDateFromTriple(triple: Triple<String, String, String>): LocalDateTime {
+    val day = triple.first.toInt()
+    val month = Month.valueOf(triple.second.uppercase(Locale.getDefault()))
+    val year = LocalDateTime.now().year
+    return LocalDateTime.of(year, month, day, 0, 0)
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun generateDayContext(centerDate: LocalDateTime): List<Triple<String, String, String>> {
     val fullList = mutableListOf<Triple<String, String, String>>()
 
-    /** Might need performance update*/
-    for (i in -5..5 ){
-        val date = today.plusDays(i.toLong())
+    for (i in -5..5) {
+        val date = centerDate.plusDays(i.toLong())
         val month = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
         val day = date.dayOfMonth.toString().padStart(2, '0')
         val weekday = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
         fullList.add(Triple(day, month, weekday))
-
     }
     return fullList
 }
@@ -203,6 +231,8 @@ suspend fun mockDatabase(context: Context) {
         taskManager.insertUserTasks(context, taskList)
     }
 }
+
+
 
 fun mockFetch(context: Context, date: String, callback: (List<Pair<String, Boolean>>) -> Unit)
 {
