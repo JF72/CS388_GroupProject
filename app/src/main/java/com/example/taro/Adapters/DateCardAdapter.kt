@@ -6,24 +6,32 @@ import com.example.taro.R
 import com.example.taro.components.DateCard
 
 class DateCardAdapter(
-    private val items: MutableList<Triple<String, String, String>>
+    private val items: MutableList<Triple<String, String, String>>,
+    private var selectedDate: Int = 5,
+    private val onDateSelected: (Int, Triple<String,String,String>) -> Unit
 ) : RecyclerView.Adapter<DateCardAdapter.DateCardViewHolder>() {
 
-    class DateCardViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
+    inner class DateCardViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DateCardViewHolder {
-        // Inflate ComposeView and pass it to the ViewHolder
-        val composeView = ComposeView(parent.context)
-        return DateCardViewHolder(composeView)
+        return DateCardViewHolder(ComposeView(parent.context))
+//        // Inflate ComposeView and pass it to the ViewHolder
+//        val composeView = ComposeView(parent.context)
+//        return DateCardViewHolder(composeView)
     }
 
     override fun onBindViewHolder(holder: DateCardViewHolder, position: Int) {
-        // Get the item
         val (day, month, weekday) = items[position]
+        val isSelected = position == selectedDate
 
-        // Set content using Jetpack Compose
-        holder.composeView.setContent {
-            DateCard(day = day, month = month, weekday = weekday)
+        holder.composeView.setContent{
+            DateCard( day = day, month = month, weekday = weekday, isSelected = isSelected){
+                val previousDate =  selectedDate
+                selectedDate = position
+                notifyItemChanged(previousDate)
+                notifyItemChanged(selectedDate)
+                onDateSelected(position, items[position])
+            }
         }
     }
 
