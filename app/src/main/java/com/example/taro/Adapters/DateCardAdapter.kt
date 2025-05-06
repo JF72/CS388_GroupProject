@@ -15,9 +15,6 @@ class DateCardAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DateCardViewHolder {
         return DateCardViewHolder(ComposeView(parent.context))
-//        // Inflate ComposeView and pass it to the ViewHolder
-//        val composeView = ComposeView(parent.context)
-//        return DateCardViewHolder(composeView)
     }
 
     override fun onBindViewHolder(holder: DateCardViewHolder, position: Int) {

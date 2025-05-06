@@ -38,6 +38,7 @@ class TaroHomePage : ComponentActivity() {
     private lateinit var welcomeText: TextView
     private lateinit var DateComposeRecyclerView : RecyclerView
     private lateinit var adapter : DateCardAdapter
+
     private val taroManager : TaroTasksManager = TaroTasksManager()
     /** List Item Recycler View */
     private lateinit var  TaskListRecyclerView : RecyclerView
@@ -81,33 +82,11 @@ class TaroHomePage : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         /** Default 30 days*/
-
-
-
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-
         /**
          *  Created A list of Triples based on the Previews 30 days and the Upcoming 30 Days
          *  It most Have : Month , DateNumber, Day of the Week
          */
-
-//
-//        val data = mutableListOf(
-//            Triple("11", "April", "Friday"),
-//            Triple("12", "May", "Saturday"),
-//            Triple("13", "June", "Sunday"),
-//            Triple("13", "June", "Sunday"),
-//            Triple("13", "June", "Sunday"),
-//            Triple("13", "June", "Sunday"),
-//            Triple("13", "June", "Sunday")
-//        )
-
-//        val concatenatedList = mutableListOf<Triple<String, String, String>>().apply {
-//            (dayContext?.get("PreviousDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
-//            (dayContext?.get("UpcomingDays") as? MutableList<Triple<String, String, String>>)?.let { addAll(it) }
-//        }
-//        Log.e("ConcatenatedList",concatenatedList.size.toString())
 
         /** Auto Generate Tasks  to the Database **/
         CoroutineScope(Dispatchers.IO).launch{
@@ -116,7 +95,7 @@ class TaroHomePage : ComponentActivity() {
         /**Mocking Database **/
 
         DateComposeRecyclerView = findViewById(R.id.DateRecyclerView);
-//        adapter = DateCardAdapter(concatenatedList);
+
         val dayCards = generateDayContext().toMutableList()
         adapter = DateCardAdapter(
             items = dayCards,
@@ -125,28 +104,44 @@ class TaroHomePage : ComponentActivity() {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             val selectedDate = LocalDateTime.now().plusDays(index - 5L).format(formatter)
 
-            // Fetch tasks for this specific date
-//            mockFetch(this, selectedDate) { taskData ->
-//                TaskListAdapter = TaskListComposeAdapter(taskData)
-//                TaskListRecyclerView.adapter = TaskListAdapter
-//            }
+            // 🔥 Fetch tasks for this specific date
+            mockFetch(this, selectedDate) { taskData ->
+                TaskListAdapter = TaskListComposeAdapter(taskData)
+                TaskListRecyclerView.adapter = TaskListAdapter
+            }
         }
+
 
 
         DateComposeRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         DateComposeRecyclerView.adapter = adapter;
+
+        val selectedIndex = 5
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        DateComposeRecyclerView.layoutManager = layoutManager
+        DateComposeRecyclerView.adapter = adapter
+
+        DateComposeRecyclerView.post {
+            val itemWidthPx = (64 * resources.displayMetrics.density).toInt()
+            val screenWidth = resources.displayMetrics.widthPixels
+            val offset = (screenWidth / 2) - (itemWidthPx / 2)
+            (DateComposeRecyclerView.layoutManager as? LinearLayoutManager)
+                ?.scrollToPositionWithOffset(5, offset)
+        }
+
+
 
 
         TaskListRecyclerView = findViewById(R.id.TaskListRecyclerView);
 
         TaskListRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
 
-        mockFetch(this) { dummyData ->
-            // Now you can use taskListDummyData here
-            // You can now pass this to your adapter or whatever you need
-            TaskListAdapter = TaskListComposeAdapter(dummyData);
-            TaskListRecyclerView.adapter = TaskListAdapter
-        }
+//        mockFetch(this) { dummyData ->
+//            // Now you can use taskListDummyData here
+//            // You can now pass this to your adapter or whatever you need
+//            TaskListAdapter = TaskListComposeAdapter(dummyData);
+//            TaskListRecyclerView.adapter = TaskListAdapter
+//        }
 
         /* Deleted Welcome Message
 
@@ -209,15 +204,17 @@ suspend fun mockDatabase(context: Context) {
     }
 }
 
-fun mockFetch(context: Context, callback: (List<Pair<String, Boolean>>) -> Unit) {
+fun mockFetch(context: Context, date: String, callback: (List<Pair<String, Boolean>>) -> Unit)
+{
     val taskManager = TaroTasksManager()
 
     CoroutineScope(Dispatchers.IO).launch {
-        val tasks = taskManager.getTasksByDate(context,"2025-05-05")
+        val tasks = taskManager.getTasksByDate(context, date)
         val dummyData = tasks.map { it.name to it.isCompleted }
 
         withContext(Dispatchers.Main) {
-            callback(dummyData) // Return to caller on Main thread
+            callback(dummyData)
         }
     }
+
 }
