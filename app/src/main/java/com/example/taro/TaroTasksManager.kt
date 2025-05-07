@@ -88,6 +88,6 @@ class TaroTasksManager {
         return finalScore;
     }
 
-    fun insertPathData(context: Context, userPath,)
+    fun insertPathData(context: Context,){}
 
 }
