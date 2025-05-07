@@ -7,15 +7,15 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "user_tasks")
 data class UserPathsDb(
 
-    @PrimaryKey(autoGenerate = true) val uid : Int = 0,
+    @PrimaryKey(autoGenerate = true) val uid: Int = 0,
 
-    @ColumnInfo(name="dueDate") val dueDate : String? = null,
-
-
-    @ColumnInfo(name="Path") val Path : List<String> = null
+    @ColumnInfo(name="dueDate") val dueDate: String? = null,
 
 
-){
+    @ColumnInfo(name="Path") val Path: List<String>? = null,
+
+
+    ){
 
 }
 
