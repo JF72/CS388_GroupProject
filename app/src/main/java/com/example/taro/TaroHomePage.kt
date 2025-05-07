@@ -47,7 +47,7 @@ class TaroHomePage : ComponentActivity() {
     private lateinit var  TaskListRecyclerView : RecyclerView
     private lateinit var TaskListAdapter : TaskListComposeAdapter
 
-    private  lateinit var pathSelectedDate : String
+    public  lateinit var pathSelectedDate : String
 
     /** By Default it will hold the Previous and After 30 days. */
     private var dayContext: MutableMap<String, MutableList<Triple<String, String, String>>>? = null
@@ -146,15 +146,12 @@ class TaroHomePage : ComponentActivity() {
         }
 
 
-
-
         TaskListRecyclerView = findViewById(R.id.TaskListRecyclerView);
 
         TaskListRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+
         initializeTaskPopUp.setContent{
-
             Box(modifier = Modifier.fillMaxSize()) {
-
                 // Centered StartTasksButton
                 LargeFloatingActionButton(
                     onClick = {
@@ -175,9 +172,9 @@ class TaroHomePage : ComponentActivity() {
                         taskPopUpComposeView.setContent {
                             AddTaskPopUp(onDismissRequest = {
                                 taskPopUpComposeView.setContent {}
+
                             })
                         }
-
                     },
                     containerColor = Color(0xFF00BFFF),
                     modifier = Modifier

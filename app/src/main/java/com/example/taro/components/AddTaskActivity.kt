@@ -187,12 +187,9 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
                                         expectedDuration = expectedDuration
                                     );
                                     println("Saving task: $task")
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        //Adding To Db
-                                        addTaskToDb(context,task);
-
-
-                                    }
+                                    val taskManager = TaroTasksManager()
+                                    val taskListHolder = listOf(task)
+                                    taskManager.insertUserTasks(context,taskListHolder);
 
                                     onDismissRequest()
                                 }
@@ -207,18 +204,6 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
     }
 }
 
-
-
-@RequiresApi(Build.VERSION_CODES.O)
-suspend  fun addTaskToDb(context : Context, newTask: UserTaskDb){
-    val taskManager = TaroTasksManager()
-
-    val taskListHolder : List<UserTaskDb> = listOf(newTask)
-    withContext(Dispatchers.IO){
-        taskManager.insertUserTasks(context,taskListHolder);
-
-    }
-}
 
 
 
@@ -327,7 +312,6 @@ fun RatingRow(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -26,24 +26,32 @@ class TaroPathPage : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Set content view first
-        setContentView(R.layout.taro_path_page)
-        val context = this
-
-        // Then find ComposeView and set its content
-
-        val taskPathComposeView = findViewById<ComposeView>(R.id.taskPath)
-
-        val pathSelectedDate = intent.getStringExtra("selectedDate");
-        // Use remember and mutableStateOf for state management
+        val taroQuotesView = R.layout.taro_quotes;
 
 
+        setContentView(taroQuotesView);
 
-        taskPathComposeView.setContent {
-            // Pass the list to the Composable function
+        Handler(Looper.getMainLooper()).postDelayed({
+            setContentView(R.layout.taro_path_page)
+            val context = this
+
+            // Then find ComposeView and set its content
+
+            val taskPathComposeView = findViewById<ComposeView>(R.id.taskPath)
+
+            val pathSelectedDate = intent.getStringExtra("selectedDate");
+            // Use remember and mutableStateOf for state management
             if (pathSelectedDate != null) {
-                TaroPathScreen(pathSelectedDate)
+                Log.d("DATE SELECTED",pathSelectedDate);
             }
-        }
+            taskPathComposeView.setContent {
+                // Pass the list to the Composable function
+                if (pathSelectedDate != null) {
+                    TaroPathScreen(pathSelectedDate)
+                }
+            }
+        }, 3000)
+
 
 
 

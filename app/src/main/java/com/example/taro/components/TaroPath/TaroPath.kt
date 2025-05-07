@@ -75,8 +75,6 @@ fun TaroPathScreen(selectedDate : String) {
     val isLoading = remember { mutableStateOf(true) }
     val isGeneratingScore = remember { mutableStateOf(true) }
 
-
-
     LaunchedEffect(selectedDate) {
         isGeneratingScore.value = true
         isLoading.value = true
@@ -152,7 +150,7 @@ fun PathWithTasks(tasks: List<UserTaskDb>,) {
 
 @Composable
 fun TaroPath(pointCount: Int, modifier: Modifier = Modifier, tasks : List<UserTaskDb>) {
-    val pointsList: MutableList<Offset> = generateCoordinates(pointCount.coerceAtLeast(3))
+    val pointsList: MutableList<Offset> = generateCoordinates(pointCount)
     var stateTasks by remember { mutableStateOf<List<UserTaskDb>>(tasks) }
 
     Canvas(modifier = modifier) {
@@ -209,7 +207,9 @@ fun TaroPath(pointCount: Int, modifier: Modifier = Modifier, tasks : List<UserTa
                 join= StrokeJoin.Round)
         )
     }
-    pointsList.forEachIndexed { index,coordinate, ->
+
+
+    pointsList.zip(stateTasks).forEach { (coordinate, task) ->
         // Calculate scaling factors to fit all points within the canvas
         val xValues = pointsList.map { it.x }
         val yValues = pointsList.map { it.y }
@@ -233,8 +233,9 @@ fun TaroPath(pointCount: Int, modifier: Modifier = Modifier, tasks : List<UserTa
         val scaledY = ((coordinate.y - minY) * yScale + padding)
 
         PositionedTaskPoint(scaledX = scaledX, scaledY = scaledY) {
-            TaroPathTaskPoint(task = stateTasks[index])
+            TaroPathTaskPoint(task = task)
         }
+
     }
 
 }

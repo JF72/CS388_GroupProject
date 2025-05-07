@@ -2,6 +2,13 @@ package com.example.taro
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.recyclerview.widget.RecyclerView
+import androidx.room.util.query
 import com.example.taro.Adapters.TaskListComposeAdapter
 import com.example.taro.Dao.TaroDb
 import com.example.taro.Dao.UserTaskDb
@@ -11,9 +18,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.*
 
 class TaroTasksManager {
-    private lateinit var TaskListAdapter : TaskListComposeAdapter
+    private lateinit var taskListAdapter : TaskListComposeAdapter;
+    private lateinit var  TaskListRecyclerView : RecyclerView
+
 
     fun insertUserTasks(context: Context, userTasks : List<UserTaskDb>){
+        taskListAdapter = TaskListComposeAdapter(emptyList());
+        var newFetchedData : List<Pair<String, Boolean>>;
         CoroutineScope(Dispatchers.IO).launch {
             // before inserting take the task information and generate the score
             val dao = (context.applicationContext as TaroApplication).db.taroDao()
@@ -24,11 +35,8 @@ class TaroTasksManager {
 
             val newData = userTasks[0].dueDate?.let { getTasksByDate(context, it) }
 
-            val newFetchedData = newData?.map { it.name to it.isCompleted }
+            newFetchedData = newData?.map { it.name to it.isCompleted }!!
 
-            if (newFetchedData != null) {
-                TaskListAdapter.updateData(newFetchedData)
-            }
         }
     }
 
