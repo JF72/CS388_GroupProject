@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.sp
 import com.example.taro.R
 
 @Composable
-@Preview
+//@Preview
 
-fun HeaderBar(){
+fun HeaderBar(onProfileClick: () -> Unit){
     Column(
         modifier = Modifier
         .background(Color.White)
@@ -43,23 +43,25 @@ fun HeaderBar(){
         ){
             Row(verticalAlignment = Alignment.CenterVertically){
                 Image(
-                    painter = painterResource(id = R.drawable.profile_icon),
+                    painter = painterResource(id = R.drawable.coin_icon),
                     contentDescription = "Points Icon",
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "X Points",
+                    text = "0 Points",
                     color = Color(0xFF2C6AFD),
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            Icon(
-                painter = painterResource(id = R.drawable.profile_icon),
-                contentDescription = "Profile",
-                tint = Color(0xFF2C6AFD)
-            )
+            IconButton(onClick = onProfileClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.profile_icon),
+                    contentDescription = "Profile",
+                    tint = Color(0xFF2C6AFD)
+                )
+            }
         }
         Text(
             text = "Today's Tasks",

@@ -2,6 +2,7 @@ package com.example.taro.components.TaroPath
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,6 +16,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import com.example.taro.Dao.UserTaskDb
 import com.example.taro.R
+import com.example.taro.TaroHomePage
 import com.example.taro.TaroTasksManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,8 +38,15 @@ class TaroPathPage : ComponentActivity() {
             val context = this
 
             // Then find ComposeView and set its content
-
+            val headerComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.headerNavBar)
+            headerComposeView.setContent {
+                com.example.taro.components.HeaderBar(onProfileClick ={
+                    val intent = Intent(context, TaroHomePage::class.java)
+                    context.startActivity(intent)
+                })
+            }
             val taskPathComposeView = findViewById<ComposeView>(R.id.taskPath)
+
 
             val pathSelectedDate = intent.getStringExtra("selectedDate");
             // Use remember and mutableStateOf for state management
