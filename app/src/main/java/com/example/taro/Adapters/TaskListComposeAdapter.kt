@@ -1,4 +1,5 @@
 package com.example.taro.Adapters
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
@@ -9,9 +10,10 @@ import com.example.taro.components.TaskListItem
 
 
 class TaskListComposeAdapter(
-    private val items : List<Pair<String,Boolean>>
+    private var items : List<Pair<String,Boolean>>
 ) : RecyclerView.Adapter<TaskListComposeAdapter.TaskListViewHolder>(){
     class TaskListViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView);
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskListViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -19,6 +21,11 @@ class TaskListComposeAdapter(
         return TaskListViewHolder(view)
     };
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateData(newTasks : List<Pair<String,Boolean>>){
+        items = newTasks;
+        notifyDataSetChanged();
+    }
     override fun onBindViewHolder(holder: TaskListViewHolder, position: Int) {
         val (taskName,completed) = items[position]
         holder.composeView.setContent {

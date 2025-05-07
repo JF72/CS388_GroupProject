@@ -185,14 +185,15 @@ fun AddTaskPopUp(onDismissRequest: () -> Unit) {
                                         dueDate = dueDate,
                                         isCompleted = isCompleted,
                                         expectedDuration = expectedDuration
-                                    )
+                                    );
                                     println("Saving task: $task")
-
                                     CoroutineScope(Dispatchers.IO).launch {
                                         //Adding To Db
                                         addTaskToDb(context,task);
 
+
                                     }
+
                                     onDismissRequest()
                                 }
                             ) {
@@ -215,6 +216,7 @@ suspend  fun addTaskToDb(context : Context, newTask: UserTaskDb){
     val taskListHolder : List<UserTaskDb> = listOf(newTask)
     withContext(Dispatchers.IO){
         taskManager.insertUserTasks(context,taskListHolder);
+
     }
 }
 

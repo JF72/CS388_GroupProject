@@ -38,10 +38,9 @@ class MainActivity : ComponentActivity() {
 
         val homeIntent = Intent(this,TaroHomePage::class.java)
 
-        val taroPathIntent = Intent(this, TaroPathPage::class.java);
 
         NoBtn.setOnClickListener{
-            startActivity(taroPathIntent);
+            startActivity(homeIntent);
         }
         YesBtn.setOnClickListener{
             startActivity(homeIntent)

@@ -1,40 +1,38 @@
 package com.example.taro.components.TaroPath
 
+import android.content.Context
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.taro.Dao.UserTaskDb
+import com.example.taro.TaroTasksManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 data class Task(
@@ -43,47 +41,120 @@ data class Task(
     val status: String
 )
 @Composable
-fun TaroPathScreen(sortedTasks: List<Task>) {
+fun TaroPathScreen(selectedDate : String) {
     // Sample tasks
     val tasks = listOf(
-        Task("Complete Project Planning", "Define project scope and requirements", "Completed"),
-        Task("Design UI Mockups", "Create wireframes for the main screens", "In Progress"),
-        Task("Implement Authentication", "Set up user login and registration", "Not Started"),
-        Task("Implement Authentication", "Set up user login and registration", "Not Started"),
-        Task("Implement Authentication", "Set up user login and registration", "Not Started"),
-        Task("Implement Authentication", "Set up user login and registration", "Not Started")
+        UserTaskDb(
+            name = "Write report",
+            description = "Complete the monthly status report",
+            difficulty = 3,
+            priority = 2,
+            urgency = 4,
+            expectedDuration = 90.0, // in minutes
+            dueDate = "2025-05-07",
+            isCompleted = false,
+            taroScore = 72.5,
+            completedOn = null
+        ),
+        UserTaskDb(
+            name = "Fix login bug",
+            description = "Resolve issue with user login timeout",
+            difficulty = 4,
+            priority = 3,
+            urgency = 5,
+            expectedDuration = 120.0,
+            dueDate = "2025-05-07",
+            isCompleted = false,
+            taroScore = 85.0,
+            completedOn = null
+        ),
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
+    val context = LocalContext.current
+    val sortedTasks = remember { mutableStateOf<List<UserTaskDb>>(listOf()) }
+    val isLoading = remember { mutableStateOf(true) }
+    val isGeneratingScore = remember { mutableStateOf(true) }
 
-        if (sortedTasks.isNotEmpty()){
-            PathWithTasks(sortedTasks)
-        }else{
-            PathWithTasks(tasks)
+
+
+    LaunchedEffect(selectedDate) {
+        isGeneratingScore.value = true
+        isLoading.value = true
+
+        // Step 1: Run generateScore (must be suspend or wrapped in coroutine)
+        generateScore(context, selectedDate)
+
+        // Step 2: Fetch data
+        fetchData(context, selectedDate) { taskData ->
+            sortedTasks.value = taskData
+            isLoading.value = false
+            isGeneratingScore.value = false
+        }
+    }
+
+
+    if (isGeneratingScore.value){
+        CircularProgressIndicator()
+    }
+    else{
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+        ) {
+            if (isLoading.value) {
+                CircularProgressIndicator()
+            } else {
+                if (sortedTasks.value.isNotEmpty()){
+                    PathWithTasks(sortedTasks.value)
+                }else{
+                    PathWithTasks(tasks)
+                }
+            }
+
         }
 
+    }
+
+
+}
+
+
+fun fetchData(context: Context, pathSelectedDate:String, callback : (List<UserTaskDb>)->Unit){
+    val taroTasksManager = TaroTasksManager()
+    CoroutineScope(Dispatchers.IO).launch {
+        val tasks = pathSelectedDate.let { taroTasksManager.getTasksByDate(context, it) }
+        withContext(Dispatchers.Main) {
+            callback(tasks)
+        }
+    }
+}
+
+suspend fun generateScore(context: Context, pathSelectedDate: String) {
+    val taroTasksManager = TaroTasksManager()
+    withContext(Dispatchers.IO) {
+        taroTasksManager.setTasksTaroScore(context, pathSelectedDate, 3)
     }
 }
 
 @Composable
-fun PathWithTasks(tasks: List<Task>) {
+fun PathWithTasks(tasks: List<UserTaskDb>,) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height((200 * tasks.size).dp)
     ) {
-        TaroPath(tasks.size, Modifier.fillMaxSize())
+
+        TaroPath(tasks.size, Modifier.fillMaxSize(),tasks)
     }
 }
 
 @Composable
-fun TaroPath(pointCount: Int, modifier: Modifier = Modifier) {
+fun TaroPath(pointCount: Int, modifier: Modifier = Modifier, tasks : List<UserTaskDb>) {
     val pointsList: MutableList<Offset> = generateCoordinates(pointCount.coerceAtLeast(3))
+    var stateTasks by remember { mutableStateOf<List<UserTaskDb>>(tasks) }
+
     Canvas(modifier = modifier) {
         val canvasWidth = size.width
         val canvasHeight = size.height
@@ -138,7 +209,7 @@ fun TaroPath(pointCount: Int, modifier: Modifier = Modifier) {
                 join= StrokeJoin.Round)
         )
     }
-    pointsList.forEach { coordinate ->
+    pointsList.forEachIndexed { index,coordinate, ->
         // Calculate scaling factors to fit all points within the canvas
         val xValues = pointsList.map { it.x }
         val yValues = pointsList.map { it.y }
@@ -162,7 +233,7 @@ fun TaroPath(pointCount: Int, modifier: Modifier = Modifier) {
         val scaledY = ((coordinate.y - minY) * yScale + padding)
 
         PositionedTaskPoint(scaledX = scaledX, scaledY = scaledY) {
-            TaroPathTaskPoint()
+            TaroPathTaskPoint(task = stateTasks[index])
         }
     }
 
