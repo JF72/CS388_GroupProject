@@ -8,6 +8,11 @@
     android:backgroundTint="#ECFFF4">
 
     <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/headerNavBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <androidx.compose.ui.platform.ComposeView
         android:id="@+id/taskPath"
         android:layout_width="400dp"
         android:layout_height="762dp"

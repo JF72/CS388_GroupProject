@@ -71,7 +71,9 @@ class TaroHomePage : ComponentActivity() {
         var taskPopUpComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.taskAddPopUp)
         val headerComposeView = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.headerNavBar)
         headerComposeView.setContent {
-            com.example.taro.components.HeaderBar()
+            com.example.taro.components.HeaderBar(onProfileClick ={
+
+            })
         }
         val taroPathIntent = Intent(this, TaroPathPage::class.java);
 
