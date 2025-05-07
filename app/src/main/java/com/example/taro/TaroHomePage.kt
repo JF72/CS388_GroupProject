@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taro.Adapters.TaskListComposeAdapter
 import com.example.taro.components.AddTaskPopUp
 import com.example.taro.Dao.UserTaskDb
-import com.example.taro.components.StartTasksButton
 import com.example.taro.components.TaroPath.TaroPathPage
 import kotlinx.coroutines.*
 import com.google.firebase.auth.FirebaseAuth
@@ -47,6 +46,8 @@ class TaroHomePage : ComponentActivity() {
     /** List Item Recycler View */
     private lateinit var  TaskListRecyclerView : RecyclerView
     private lateinit var TaskListAdapter : TaskListComposeAdapter
+
+    private  lateinit var pathSelectedDate : String
 
     /** By Default it will hold the Previous and After 30 days. */
     private var dayContext: MutableMap<String, MutableList<Triple<String, String, String>>>? = null
@@ -75,43 +76,7 @@ class TaroHomePage : ComponentActivity() {
         val taroPathIntent = Intent(this, TaroPathPage::class.java);
 
         val initializeTaskPopUp = findViewById<androidx.compose.ui.platform.ComposeView>(R.id.initializePopUp)
-        initializeTaskPopUp.setContent{
 
-            Box(modifier = Modifier.fillMaxSize()) {
-
-                // Centered StartTasksButton
-                LargeFloatingActionButton(
-                    onClick = { startActivity(taroPathIntent)},
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(24.dp),
-                    containerColor = Color(0xFF4DDEFD)
-
-                ) {
-                    Icon(Icons.Filled.PlayCircle, "Start Tasks")
-                }
-
-                // FloatingActionButton at the bottom end
-                FloatingActionButton(
-                    onClick = {
-                        taskPopUpComposeView.setContent {
-                            AddTaskPopUp(onDismissRequest = {
-                                taskPopUpComposeView.setContent {}
-                            })
-                        }
-                    },
-                    containerColor = Color(0xFF00BFFF),
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(24.dp)
-                ) {
-                    Text("+", fontSize = 24.sp, color = Color.White)
-                }
-            }
-
-
-
-        }
 
         super.onCreate(savedInstanceState)
 
@@ -122,9 +87,6 @@ class TaroHomePage : ComponentActivity() {
          *  It most Have : Month , DateNumber, Day of the Week
          */
 
-        /** Auto Generate Tasks  to the Database **/
-        CoroutineScope(Dispatchers.IO).launch{
-        }
 
         /**Mocking Database **/
 
@@ -137,6 +99,7 @@ class TaroHomePage : ComponentActivity() {
             // Calculate the new center date from the clicked card
             val oldCenterDate = adapter.items[5] // Middle item before update
             val daysFromNow = index - 5L
+
             val newCenterDate = generateDateFromTriple(oldCenterDate).plusDays(daysFromNow)
 
             // Generate new 11-day window around the selected date
@@ -153,6 +116,8 @@ class TaroHomePage : ComponentActivity() {
             // Fetch and display tasks for the new selected date
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             val selectedDate = newCenterDate.format(formatter)
+
+            pathSelectedDate = selectedDate;
 
             mockFetch(this, selectedDate) { taskData ->
                 TaskListAdapter = TaskListComposeAdapter(taskData)
@@ -186,7 +151,46 @@ class TaroHomePage : ComponentActivity() {
         TaskListRecyclerView = findViewById(R.id.TaskListRecyclerView);
 
         TaskListRecyclerView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        initializeTaskPopUp.setContent{
 
+            Box(modifier = Modifier.fillMaxSize()) {
+
+                // Centered StartTasksButton
+                LargeFloatingActionButton(
+                    onClick = {
+                        taroPathIntent.putExtra("selectedDate",pathSelectedDate)
+                        startActivity(taroPathIntent) },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(24.dp),
+                    containerColor = Color(0xFF4DDEFD)
+
+                ) {
+                    Icon(Icons.Filled.PlayCircle, "Start Tasks")
+                }
+
+                // FloatingActionButton at the bottom end
+                FloatingActionButton(
+                    onClick = {
+                        taskPopUpComposeView.setContent {
+                            AddTaskPopUp(onDismissRequest = {
+                                taskPopUpComposeView.setContent {}
+                            })
+                        }
+
+                    },
+                    containerColor = Color(0xFF00BFFF),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(24.dp)
+                ) {
+                    Text("+", fontSize = 24.sp, color = Color.White)
+                }
+            }
+
+
+
+        }
         /* Deleted Welcome Message
 
         if (userId != null) {
@@ -253,7 +257,6 @@ suspend fun mockDatabase(context: Context) {
         taskManager.insertUserTasks(context, taskList)
     }
 }
-
 
 
 fun mockFetch(context: Context, date: String, callback: (List<Pair<String, Boolean>>) -> Unit)

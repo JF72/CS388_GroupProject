@@ -51,13 +51,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.taro.Dao.UserTaskDb
 import com.example.taro.TaroTasksManager
-import com.example.taro.UserTask
 import kotlin.math.min
 
 
-@Preview
 @Composable
-fun TaroPathTaskPoint(task : UserTaskDb = UserTaskDb(
+fun TaroPathTaskPoint(
+    task: UserTaskDb = UserTaskDb(
     name = "Test",
     description = "",
     difficulty = 3,
@@ -67,7 +66,7 @@ fun TaroPathTaskPoint(task : UserTaskDb = UserTaskDb(
     isCompleted = true,
     expectedDuration = 2.0,
     taroScore = 0.0
-), onClick : () -> Unit = {}
+), onClick: () -> Unit = {},
 ){
     var showDialog by remember { mutableStateOf(false) }
     ExtendedFloatingActionButton(
@@ -182,13 +181,21 @@ taroScore = 0.0)) {
                         )
 
                         task.taroScore?.let {
+
+                            DonutChart(value = it.toFloat(),
+                                maxValue = 80f,
+                                primaryColor = Color(0xFF6200EA),
+                                secondaryColor = Color(0xFFE0E0E0),
+                                modifier = Modifier.padding(16.dp))
+
+                            /*
                             DonutChart(
                                 value = it.toFloat(),
                                 maxValue = 5f,
                                 primaryColor = Color(0xFF6200EA),
                                 secondaryColor = Color(0xFFE0E0E0),
                                 modifier = Modifier.padding(16.dp)
-                            )
+                            )*/
                         }
                         Text(
                             text = "TaroScore",
@@ -201,6 +208,7 @@ taroScore = 0.0)) {
                 if(!task.isCompleted){
                     Button(onClick = {
                         taroManager.updateTaskStatus(context,true,task.uid)
+
                     }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C6AFD))) {
                         Text("Mark as Complete")
                     }
@@ -298,11 +306,13 @@ fun DonutChart(
 }
 
 
+
+
 fun generateArcColor(value : Float, maxValue : Float): Color {
 
-    if (value <= 2.0){
+    if (value <= maxValue/3){
         return Color(0xFF4DDEFD)
-    } else if (2.0 < value && value < 4.0){
+    } else if (maxValue/3 < value && value < maxValue/2){
         return Color(0xFFE59318)
     }
     else{
